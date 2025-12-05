@@ -13,7 +13,7 @@ const Navbar: React.FC = () => {
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-8" aria-label="Primary">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-3 focus-ring rounded-md">
-            <div className="relative h-10 w-28">
+            <div className="relative h-12 w-36 md:h-12 md:w-36 sm:h-11 sm:w-32">
               <Image src="/assets/logo-light.jpg" alt="TWA Inc. logo" fill className={`object-contain ${theme === 'dark' ? 'opacity-0' : 'opacity-100'}`} priority />
               <Image src="/assets/logo-dark.jpg" alt="TWA Inc. logo" fill className={`object-contain transition ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`} />
             </div>

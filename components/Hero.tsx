@@ -3,10 +3,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import React from 'react';
 
-const stats = [
-  { label: 'Win rate', value: '71%' },
-  { label: 'Students mentored', value: '120+' },
-  { label: 'Avg. monthly ROI', value: '18.3%' }
+const highlights = [
+  'Structured price action mentorship',
+  'Risk-first approach and journal reviews',
+  'Live breakdowns of trades and weekly markups'
 ];
 
 const Hero: React.FC = () => {
@@ -34,11 +34,16 @@ const Hero: React.FC = () => {
                 Meet the trader
               </Link>
             </div>
-            <div className="mt-10 grid grid-cols-3 gap-4 text-sm">
-              {stats.map((stat) => (
-                <div key={stat.label} className="rounded-2xl border border-white/30 bg-white/70 p-4 text-slate-800 shadow dark:border-white/10 dark:bg-white/5 dark:text-slate-100">
-                  <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">{stat.label}</p>
-                  <p className="text-2xl font-bold">{stat.value}</p>
+            <div className="mt-10 grid grid-cols-1 gap-4 text-sm sm:grid-cols-3">
+              {highlights.map((item) => (
+                <div
+                  key={item}
+                  className="flex items-start gap-3 rounded-2xl border border-white/30 bg-white/70 p-4 text-slate-800 shadow dark:border-white/10 dark:bg-white/5 dark:text-slate-100"
+                >
+                  <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-brand-primary/15 text-brand-primary">
+                    •
+                  </span>
+                  <p className="text-sm font-semibold leading-relaxed">{item}</p>
                 </div>
               ))}
             </div>
@@ -67,26 +72,6 @@ const Hero: React.FC = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-            className="absolute -bottom-10 -left-6 hidden w-64 rounded-2xl border border-white/20 bg-white/90 p-4 shadow-xl dark:bg-slate-900/80 md:block"
-            aria-hidden
-          >
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-300">Equity curve</p>
-            <svg viewBox="0 0 200 80" className="mt-2 h-24 w-full text-brand-primary" role="presentation">
-              <defs>
-                <linearGradient id="curve" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stopColor="currentColor" stopOpacity="0.9" />
-                  <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              <path d="M0 60 Q40 20 80 40 T160 20 T200 15" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-              <path d="M0 60 Q40 20 80 40 T160 20 T200 15 V80 H0 Z" fill="url(#curve)" />
-            </svg>
-            <p className="text-[11px] text-slate-500 dark:text-slate-300">Decorative equity curve for aesthetic only.</p>
           </motion.div>
         </div>
       </div>

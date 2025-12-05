@@ -38,8 +38,8 @@ export default function About() {
             </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="space-y-6">
-            <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-lg">
-              <Image src="/assets/about-portrait.jpg" width={900} height={900} alt="Portrait of the trader" className="h-full w-full object-cover" />
+            <div className="mx-auto max-w-[520px] overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-lg">
+              <Image src="/assets/about-portrait.jpg" width={900} height={900} alt="Portrait of the trader" className="h-auto w-full max-h-[520px] object-cover" />
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/70 p-4 shadow dark:bg-white/5">
               <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-300">Brand partners</p>
