@@ -53,7 +53,7 @@ const Hero: React.FC = () => {
           >
             <div className="gradient-border rounded-3xl bg-brand-surface p-2 shadow-glow">
               <div className="relative overflow-hidden rounded-2xl bg-slate-900 shadow-lg">
-                <Image src="/assets/about-portrait.svg" alt="Professional trader portrait" width={900} height={900} priority className="h-full w-full object-cover" />
+                <Image src="/assets/about-portrait.jpg" alt="Professional trader portrait" width={900} height={900} priority className="h-full w-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent" aria-hidden />
                 <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-xl bg-white/10 px-4 py-3 text-white backdrop-blur">
                   <div>

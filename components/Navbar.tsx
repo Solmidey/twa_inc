@@ -14,8 +14,8 @@ const Navbar: React.FC = () => {
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-3 focus-ring rounded-md">
             <div className="relative h-10 w-28">
-              <Image src="/assets/logo-light.svg" alt="TWA Inc. logo" fill className={`object-contain ${theme === 'dark' ? 'opacity-0' : 'opacity-100'}`} priority />
-              <Image src="/assets/logo-dark.svg" alt="TWA Inc. logo" fill className={`object-contain transition ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`} />
+              <Image src="/assets/logo-light.jpg" alt="TWA Inc. logo" fill className={`object-contain ${theme === 'dark' ? 'opacity-0' : 'opacity-100'}`} priority />
+              <Image src="/assets/logo-dark.jpg" alt="TWA Inc. logo" fill className={`object-contain transition ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`} />
             </div>
             <span className="sr-only">TWA Inc. home</span>
           </Link>

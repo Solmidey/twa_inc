@@ -39,13 +39,13 @@ export default function About() {
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="space-y-6">
             <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-lg">
-              <Image src="/assets/about-portrait.svg" width={900} height={900} alt="Portrait of the trader" className="h-full w-full object-cover" />
+              <Image src="/assets/about-portrait.jpg" width={900} height={900} alt="Portrait of the trader" className="h-full w-full object-cover" />
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/70 p-4 shadow dark:bg-white/5">
               <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-300">Brand partners</p>
               <div className="mt-2 flex items-center gap-4">
-                <Image src="/assets/logo-light.svg" width={120} height={40} alt="TWA Inc. light logo" className="block dark:hidden" />
-                <Image src="/assets/logo-dark.svg" width={120} height={40} alt="TWA Inc. dark logo" className="hidden dark:block" />
+                <Image src="/assets/logo-light.jpg" width={120} height={40} alt="TWA Inc. light logo" className="block dark:hidden" />
+                <Image src="/assets/logo-dark.jpg" width={120} height={40} alt="TWA Inc. dark logo" className="hidden dark:block" />
               </div>
               <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Logos adapt to the theme automatically.</p>
             </div>
