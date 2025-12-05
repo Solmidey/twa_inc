@@ -21,6 +21,28 @@ export default function Home() {
       <main id="main">
         <Hero />
         <section className="section-padding bg-brand-bg">
+          <div className="mx-auto max-w-5xl rounded-3xl border border-white/10 bg-white/70 p-10 shadow-lg dark:bg-white/5">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <div className="space-y-3">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Learn With TWA on YouTube</h2>
+                <p className="text-base text-slate-700 dark:text-slate-200">
+                  For education, trade breakdowns, and weekly market insights, make sure to follow our YouTube channel.
+                </p>
+              </div>
+              <div className="flex items-center">
+                <a
+                  href="https://www.youtube.com/@settoblack"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-primary/30 transition hover:-translate-y-0.5 hover:shadow-xl focus-ring"
+                >
+                  Visit the YouTube channel
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section className="section-padding bg-brand-bg">
           <div className="mx-auto flex max-w-5xl flex-col gap-10">
             <div className="grid gap-6 md:grid-cols-3">
               {["Market structure deconstructed", "Risk is the first input", "Accountability that compounds"].map((title) => (

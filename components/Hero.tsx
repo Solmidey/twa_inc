@@ -60,22 +60,12 @@ const Hero: React.FC = () => {
             transition={{ duration: 0.9, delay: 0.1 }}
             className="relative"
           >
-            <div className="gradient-border rounded-3xl bg-brand-surface p-2 shadow-glow">
-              <div className="relative overflow-hidden rounded-2xl bg-slate-900 shadow-lg">
-                <Image src="/assets/about-portrait.jpg" alt="Professional trader portrait" width={900} height={900} priority className="h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent" aria-hidden />
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-xl bg-white/10 px-4 py-3 text-white backdrop-blur">
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-white/70">Live trade</p>
-                    <p className="font-semibold">Breakout + VWAP</p>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" aria-hidden />
-                    streaming
-                  </div>
+              <div className="gradient-border rounded-3xl bg-brand-surface p-2 shadow-glow">
+                <div className="relative overflow-hidden rounded-2xl bg-slate-900 shadow-lg">
+                  <Image src="/assets/about-portrait.jpg" alt="Professional trader portrait" width={900} height={900} priority className="h-full w-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent" aria-hidden />
                 </div>
               </div>
-            </div>
           </motion.div>
         </div>
       </div>
