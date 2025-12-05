@@ -3,27 +3,42 @@ import { Plan } from '../components/PricingCard';
 export const plans: Plan[] = [
   {
     id: 'monthly',
-    name: 'Monthly Signals',
+    name: 'Monthly Signals (1 month)',
     price: '$149',
-    cadence: 'every month',
-    description: 'Great for traders validating the strategy with real-time guidance.',
-    features: ['Live signals & execution notes', 'Weekly office hours', 'Risk templates + journaling prompts', 'Access to Discord floor']
+    cadence: '1 month access',
+    description: 'Signals-only access with a monthly renewal cadence.',
+    features: [
+      'Access to TWA trade signals',
+      'Private Discord signals channel',
+      'Real-time updates during active market setups',
+      'Plan duration: 1 month'
+    ]
   },
   {
     id: 'bimonthly',
-    name: 'Bi-monthly Intensive',
+    name: 'Bi-monthly Signals (2 months)',
     price: '$298',
-    cadence: 'every 2 months',
-    description: 'Added cadence for traders wanting more time to compound between renewals.',
-    features: ['Everything in Monthly', 'Bi-monthly playbook review', 'Priority DM access', 'Micro-coaching on execution']
+    cadence: '2 months access',
+    description: 'Signals-only access with a bi-monthly renewal cadence.',
+    features: [
+      'Access to TWA trade signals',
+      'Private Discord signals channel',
+      'Real-time updates during active market setups',
+      'Plan duration: 2 months'
+    ]
   },
   {
     id: 'quarterly',
-    name: 'Quarterly Intensive',
+    name: 'Quarterly Signals (3 months)',
     price: '$447',
-    cadence: 'every 3 months',
-    description: 'Best for traders who want a longer commitment with regular feedback loops.',
-    features: ['Everything in Bi-monthly', 'Quarterly playbook review', 'First-look on proprietary tools', 'Private mastermind sessions']
+    cadence: '3 months access',
+    description: 'Signals-only access with a quarterly renewal cadence.',
+    features: [
+      'Access to TWA trade signals',
+      'Private Discord signals channel',
+      'Real-time updates during active market setups',
+      'Plan duration: 3 months'
+    ]
   }
 ];
 
