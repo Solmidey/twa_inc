@@ -43,15 +43,15 @@ export default function Pricing() {
     <div className="min-h-screen bg-brand-bg text-brand-contrast">
       <Head>
         <title>Pricing | TWA Inc.</title>
-        <meta name="description" content="Choose the monthly, bi-monthly, or quarterly mentorship cadence that fits your trading." />
+        <meta name="description" content="Signals-only plans with monthly, bi-monthly, or quarterly access lengths." />
         <meta property="og:title" content="Pricing | TWA Inc." />
-        <meta property="og:description" content="Monthly, bi-monthly, and quarterly plans with secure Stripe checkout." />
+        <meta property="og:description" content="Signals-only plans with secure Stripe checkout and Discord unlocks." />
       </Head>
       <Navbar />
       <main id="main" className="section-padding">
         <div className="mx-auto max-w-5xl text-center">
           <p className="text-xs uppercase tracking-wide text-slate-600 dark:text-slate-300">Plans</p>
-          <h1 className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">Signals + mentorship built for compounding.</h1>
+          <h1 className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">Signals-only plans built for compounding.</h1>
           <p className="mt-4 text-slate-700 dark:text-slate-200">
             Secure Stripe Checkout with server-side Discord unlock after payment verification.
           </p>
