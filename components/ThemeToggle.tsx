@@ -14,11 +14,11 @@ export const ThemeToggle: React.FC = () => {
       className={clsx('inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium focus-ring transition',
         'bg-brand-surface/80 shadow hover:shadow-glow border border-white/10 dark:border-white/5')}
       aria-pressed={isDark}
-      aria-label="Toggle theme"
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       disabled={!ready}
     >
       {isDark ? <MoonIcon className="h-4 w-4" aria-hidden /> : <SunIcon className="h-4 w-4" aria-hidden />}
-      <span className="hidden sm:inline">{isDark ? 'Dark' : 'Light'} mode</span>
+      <span className="hidden sm:inline">{isDark ? 'Dark mode' : 'Light mode'}</span>
     </button>
   );
 };

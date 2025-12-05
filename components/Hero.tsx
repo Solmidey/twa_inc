@@ -17,6 +17,10 @@ const Hero: React.FC = () => {
       <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 pb-16 pt-20 md:grid-cols-2 md:px-10">
         <div>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+            <div className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-brand-primary">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand-accent" aria-hidden />
+              TWA Inc.
+            </div>
             <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-slate-700 shadow dark:bg-white/5 dark:text-slate-200">
               Institutional-grade strategies for retail edge
             </p>
