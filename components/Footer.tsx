@@ -18,8 +18,12 @@ const Footer: React.FC = () => (
         </div>
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Legal</p>
-          <a href="#" className="block hover:text-brand-primary focus-ring rounded-md px-1 py-0.5">Terms</a>
-          <a href="#" className="block hover:text-brand-primary focus-ring rounded-md px-1 py-0.5">Privacy</a>
+          <Link href="/terms" className="block hover:text-brand-primary focus-ring rounded-md px-1 py-0.5">
+            Terms
+          </Link>
+          <Link href="/privacy" className="block hover:text-brand-primary focus-ring rounded-md px-1 py-0.5">
+            Privacy
+          </Link>
         </div>
       </div>
     </div>
