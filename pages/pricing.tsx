@@ -43,9 +43,9 @@ export default function Pricing() {
     <div className="min-h-screen bg-brand-bg text-brand-contrast">
       <Head>
         <title>Pricing | TWA Inc.</title>
-        <meta name="description" content="Choose the mentorship or signal plan that fits your trading cadence." />
+        <meta name="description" content="Choose the monthly, bi-monthly, or quarterly mentorship cadence that fits your trading." />
         <meta property="og:title" content="Pricing | TWA Inc." />
-        <meta property="og:description" content="Monthly, quarterly, and yearly plans with secure Stripe checkout." />
+        <meta property="og:description" content="Monthly, bi-monthly, and quarterly plans with secure Stripe checkout." />
       </Head>
       <Navbar />
       <main id="main" className="section-padding">
