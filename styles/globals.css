@@ -90,7 +90,3 @@ a {
   background: color-mix(in srgb, var(--brand-surface) 70%, transparent);
   backdrop-filter: blur(12px);
 }
-
-.skip-link {
-  @apply absolute left-4 top-4 -translate-y-full bg-brand-primary text-white px-3 py-2 rounded-md transition-transform focus:translate-y-0;
-}

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 type Theme = 'light' | 'dark';
 
@@ -19,25 +19,29 @@ export const ThemeProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     const stored = typeof window !== 'undefined' ? (localStorage.getItem('theme') as Theme | null) : null;
     const prefersDark = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
     const initial = stored ?? (prefersDark ? 'dark' : 'light');
+
     setThemeState(initial);
-    document.documentElement.classList.toggle('dark', initial === 'dark');
     setReady(true);
   }, []);
 
-  const setTheme = (value: Theme) => {
+  useEffect(() => {
+    if (!ready) return;
+
+    const root = document.documentElement;
+    root.classList.toggle('dark', theme === 'dark');
+    localStorage.setItem('theme', theme);
+  }, [theme, ready]);
+
+  const setTheme = useCallback((value: Theme) => {
     setThemeState(value);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('theme', value);
-      document.documentElement.classList.toggle('dark', value === 'dark');
-    }
-  };
+  }, []);
 
   const value = useMemo(() => ({
     theme,
     setTheme,
-    toggle: () => setTheme(theme === 'light' ? 'dark' : 'light'),
+    toggle: () => setThemeState((prev) => (prev === 'light' ? 'dark' : 'light')),
     ready
-  }), [theme]);
+  }), [theme, ready, setTheme]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };

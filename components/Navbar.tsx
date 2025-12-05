@@ -9,11 +9,10 @@ const Navbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur border-b border-white/10 bg-brand-bg/80 dark:bg-brand-bg/70">
-      <a href="#main" className="skip-link">Skip to content</a>
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-8" aria-label="Primary">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-3 focus-ring rounded-md">
-            <div className="relative h-12 w-36 md:h-12 md:w-36 sm:h-11 sm:w-32">
+            <div className="relative h-14 w-40 sm:h-16 sm:w-44 md:h-16 md:w-48">
               <Image src="/assets/logo-light.jpg" alt="TWA Inc. logo" fill className={`object-contain ${theme === 'dark' ? 'opacity-0' : 'opacity-100'}`} priority />
               <Image src="/assets/logo-dark.jpg" alt="TWA Inc. logo" fill className={`object-contain transition ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`} />
             </div>
