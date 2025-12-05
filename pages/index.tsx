@@ -35,11 +35,7 @@ export default function Home() {
             <div className="rounded-3xl border border-white/10 bg-gradient-to-r from-brand-primary/10 to-brand-accent/10 p-8 shadow-xl">
               <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-600 dark:text-slate-200">Signals + Mentorship</p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Your trading desk, modernized.</h3>
-                  <p className="max-w-2xl text-sm text-slate-700 dark:text-slate-300">
-                    Light/dark brand-aware interface, verified Stripe Checkout, and private Discord access that only unlocks after server confirmation.
-                  </p>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Access The Private Discord</h3>
                 </div>
                 <Link href="/pricing" className="rounded-full bg-brand-primary px-5 py-3 text-sm font-semibold text-white shadow focus-ring">
                   Browse plans
