@@ -47,7 +47,6 @@ export default function About() {
                 <Image src="/assets/logo-light.jpg" width={120} height={40} alt="TWA Inc. light logo" className="block dark:hidden" />
                 <Image src="/assets/logo-dark.jpg" width={120} height={40} alt="TWA Inc. dark logo" className="hidden dark:block" />
               </div>
-              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Logos adapt to the theme automatically.</p>
             </div>
           </motion.div>
         </div>
