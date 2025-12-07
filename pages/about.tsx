@@ -18,23 +18,23 @@ export default function About() {
         <div className="mx-auto grid max-w-5xl items-start gap-12 md:grid-cols-[1.1fr_0.9fr]">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
             <p className="text-xs uppercase tracking-wide text-slate-600 dark:text-slate-300">About</p>
-            <h1 className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">Trader, mentor, and execution partner.</h1>
-            <p className="mt-4 text-slate-700 dark:text-slate-200">
-              I blend discretionary price action with data-backed playbooks honed on futures, FX, and equities. From prop desk roots to running a private floor, I mentor traders on disciplined risk, probabilistic thinking, and crafting a process that survives volatility.
-            </p>
-            <div className="mt-6 space-y-3 rounded-2xl border border-white/10 bg-white/80 p-6 shadow dark:bg-white/5">
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Credentials & timeline</h2>
-              <ul className="space-y-2 text-sm text-slate-700 dark:text-slate-300">
-                <li>• Former prop trader specializing in breakout/VWAP structures.</li>
-                <li>• CMT-level technical analysis foundations with quantitative overlays.</li>
-                <li>• Built trade journal frameworks used by 120+ students.</li>
-                <li>• Guest educator for multiple trading communities.</li>
-              </ul>
-            </div>
-            <div className="mt-6 flex flex-wrap gap-4">
-              <span className="rounded-full bg-brand-primary/15 px-4 py-2 text-sm font-semibold text-brand-primary">Risk-first philosophy</span>
-              <span className="rounded-full bg-brand-accent/15 px-4 py-2 text-sm font-semibold text-brand-contrast">Execution labs weekly</span>
-              <span className="rounded-full bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100">Accountability crew</span>
+            <h1 className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">About Me — Settoblack</h1>
+            <div className="mt-4 space-y-4 text-slate-700 dark:text-slate-200">
+              <p>
+                I&apos;m Albert, a trader and an online educator. My journey began in early 2019, and everything changed in 2020 when I encountered ICT — The Inner Circle Trader. Those teachings completely reshaped my perspective and understanding of the financial markets.
+              </p>
+              <p>
+                In my own study, I learned that the only logic these markets understood was probabilities, as market opportunities can unfold in myriad ways without violating their Higher Timeframe Narratives. Recognizing this became the foundation of my philosophy.
+              </p>
+              <p>
+                Using the lens of ICT concepts, I built a system that adapts to the probabilistic nature of these markets under varying conditions to find my edge and consistency.
+              </p>
+              <p>
+                This system blends quantitative analysis via real-time data backed by a statistical edge, with a strong technical thesis. Allowing for the interpretation of the Higher Timeframe Institutional Orderflow (the long-term bias of the markets, or the Draw on Liquidity), validating feedback, and confirming signals for the integrity of higher timeframe with precision and consistency.
+              </p>
+              <p>
+                Today, I teach and share these ideas publicly so that traders can build clarity, structure, and confidence in their own decision-making.
+              </p>
             </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="space-y-6">

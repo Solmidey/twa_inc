@@ -24,7 +24,7 @@ const Navbar: React.FC = () => {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/pricing" className="hidden rounded-full border border-brand-primary/60 bg-brand-primary px-4 py-2 text-sm font-semibold text-white shadow hover:shadow-glow focus-ring md:inline-flex">Join signals</Link>
+          <Link href="/pricing" className="hidden rounded-full border border-brand-primary/60 bg-brand-primary px-4 py-2 text-sm font-semibold text-white shadow hover:shadow-glow focus-ring md:inline-flex">Subscribe</Link>
           <ThemeToggle />
         </div>
       </nav>
