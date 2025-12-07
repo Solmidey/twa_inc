@@ -43,7 +43,7 @@ export default function Pricing() {
     <div className="min-h-screen bg-brand-bg text-brand-contrast">
       <Head>
         <title>Pricing | TWA Inc.</title>
-        <meta name="description" content="Signals-only plans with monthly, bi-monthly, or quarterly access lengths." />
+        <meta name="description" content="Signals-only plans with 1, 2, 3, or 6 month access lengths." />
         <meta property="og:title" content="Pricing | TWA Inc." />
         <meta property="og:description" content="Signals-only plans with secure Stripe checkout and Discord unlocks." />
       </Head>

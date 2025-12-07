@@ -1,44 +1,45 @@
 import { Plan } from '../components/PricingCard';
 
+const sharedPerks = [
+  'Live Market Calls',
+  'Season Calls',
+  'Weekend Calls',
+  'Active Community',
+  'Private mentorship'
+];
+
 export const plans: Plan[] = [
   {
     id: 'monthly',
-    name: 'Monthly Signals (1 month)',
-    price: '$149',
+    name: '1 Month',
+    price: '$50',
     cadence: '1 month access',
-    description: 'Signals-only access with a monthly renewal cadence.',
-    features: [
-      'Access to TWA trade signals',
-      'Private Discord signals channel',
-      'Real-time updates during active market setups',
-      'Plan duration: 1 month'
-    ]
+    description: 'Signals and community access for one month.',
+    features: sharedPerks
   },
   {
     id: 'bimonthly',
-    name: 'Bi-monthly Signals (2 months)',
-    price: '$298',
+    name: '2 Months',
+    price: '$100',
     cadence: '2 months access',
-    description: 'Signals-only access with a bi-monthly renewal cadence.',
-    features: [
-      'Access to TWA trade signals',
-      'Private Discord signals channel',
-      'Real-time updates during active market setups',
-      'Plan duration: 2 months'
-    ]
+    description: 'Signals and community access for two months.',
+    features: sharedPerks
   },
   {
     id: 'quarterly',
-    name: 'Quarterly Signals (3 months)',
-    price: '$447',
+    name: '3 Months',
+    price: '$150',
     cadence: '3 months access',
-    description: 'Signals-only access with a quarterly renewal cadence.',
-    features: [
-      'Access to TWA trade signals',
-      'Private Discord signals channel',
-      'Real-time updates during active market setups',
-      'Plan duration: 3 months'
-    ]
+    description: 'Signals and community access for three months.',
+    features: sharedPerks
+  },
+  {
+    id: 'semiannual',
+    name: '6 Months',
+    price: '$300',
+    cadence: '6 months access',
+    description: 'Signals and community access for six months.',
+    features: sharedPerks
   }
 ];
 

@@ -60,7 +60,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Access The Private Discord</h3>
                 </div>
                 <Link href="/pricing" className="rounded-full bg-brand-primary px-5 py-3 text-sm font-semibold text-white shadow focus-ring">
-                  Browse plans
+                  Subscribe
                 </Link>
               </div>
             </div>
