@@ -45,7 +45,7 @@ export default function ProtectedReveal() {
         if (paystackStatus === "success") {
           setInviteUrl(invite);
           setStatus("success");
-          setMessage(invite ? "" : "Discord invite is not configured.");
+          setMessage(!invite ? "Discord invite is not configured." : "");
           return;
         }
 

@@ -1,16 +1,24 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getDiscordInviteUrl } from "../../lib/getDiscordInviteUrl";
+
+const getInviteUrl = () =>
+  process.env.DISCORD_INVITE_URL ||
+  process.env.DISCORD_INVITE_LINK ||
+  process.env.DISCORD_INVITE ||
+  "";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
-  const reference = String(req.query.reference ?? req.query.session_id ?? "").trim();
+  const reference = String(
+    req.query.reference ?? req.query.trxref ?? req.query.session_id ?? ""
+  ).trim();
+
   if (!reference) return res.status(400).json({ error: "Missing reference" });
 
   const secret = process.env.PAYSTACK_SECRET_KEY;
   if (!secret) return res.status(500).json({ error: "PAYSTACK_SECRET_KEY not set" });
 
-  const inviteUrl = getDiscordInviteUrl();
+  const inviteUrl = getInviteUrl();
   if (!inviteUrl) return res.status(500).json({ error: "Discord invite is not configured" });
 
   const psRes = await fetch(
