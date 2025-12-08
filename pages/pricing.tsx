@@ -33,7 +33,7 @@ export default function Pricing() {
       window.location.href = data.url;
     } catch (error) {
       console.error(error);
-      setMessage('We could not reach Stripe. Please try again.');
+      setMessage('We could not reach Paystack. Please try again.');
     } finally {
       setLoadingPlan(null);
     }
@@ -53,7 +53,7 @@ export default function Pricing() {
           <p className="text-xs uppercase tracking-wide text-slate-600 dark:text-slate-300">Plans</p>
           <h1 className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">Signals-only plans built for compounding.</h1>
           <p className="mt-4 text-slate-700 dark:text-slate-200">
-            Secure Stripe Checkout with server-side Discord unlock after payment verification.
+            Secure Paystack Checkout with server-side Discord unlock after payment verification.
           </p>
           <label className="mt-8 inline-flex max-w-md items-center gap-3 rounded-full border border-white/20 bg-white/70 px-4 py-3 shadow focus-within:ring-2 focus-within:ring-brand-primary dark:bg-white/5" htmlFor="email">
             <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Email for receipt & access</span>
