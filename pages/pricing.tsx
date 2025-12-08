@@ -26,11 +26,13 @@ export default function Pricing() {
         body: JSON.stringify({ planId, email })
       });
       const data = await res.json();
+      const paystackUrl = data?.data?.authorization_url ?? data?.authorization_url ?? data?.authorizationUrl ?? data?.url;
       if (!res.ok) {
         setMessage(data.error || 'Unable to start checkout.');
         return;
       }
-      window.location.href = data.url;
+      if (!paystackUrl) { setMessage(data?.error ?? data?.message ?? "Paystack returned no authorization URL"); return; }
+      window.location.href = paystackUrl;
     } catch (error) {
       console.error(error);
       setMessage('Paystack error. Please confirm PAYSTACK_SECRET_KEY is set on Vercel.');
