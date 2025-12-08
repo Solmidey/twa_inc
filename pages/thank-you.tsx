@@ -29,7 +29,7 @@ export default function ThankYou() {
               We are confirming your payment and will reveal your private Discord invitation below. Keep this page open.
             </p>
           </div>
-          <ProtectedReveal sessionId={sessionId} />
+          <ProtectedReveal />
         </div>
       </main>
       <Footer />
