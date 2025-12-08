@@ -1,34 +1,25 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { getPurchase, storeToken } from '@/lib/datastore';
-import { issueRevealToken, verifyRevealToken } from '@/lib/auth';
+import type { NextApiRequest, NextApiResponse } from "next";
 
-const INVITE_URL = 'https://discord.com/invite/fnG5DTfGs';
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'GET') {
-    const sessionId = req.query.session_id as string | undefined;
-    if (!sessionId) return res.status(400).json({ status: 'error', message: 'session_id is required' });
-    const record = getPurchase(sessionId);
-    if (!record || !record.paid) {
-      return res.status(403).json({ status: 'unpaid', message: 'Payment has not been verified yet.' });
-    }
-    const token = issueRevealToken({ sessionId, email: record.email }, '15m');
-    const expiresAt = Date.now() + 15 * 60 * 1000;
-    storeToken(sessionId, token, expiresAt);
-    return res.status(200).json({ status: 'authorized', token });
-  }
+  const reference = String((req.query.reference ?? req.query.session_id ?? "") as string);
+  if (!reference) return res.status(400).json({ error: "Missing reference" });
 
-  if (req.method === 'POST') {
-    const { token } = req.body as { token?: string };
-    if (!token) return res.status(400).json({ status: 'error', message: 'token missing' });
-    const payload = verifyRevealToken(token);
-    if (!payload) return res.status(401).json({ status: 'error', message: 'Invalid or expired token' });
-    const record = getPurchase(payload.sessionId);
-    if (!record || !record.paid || record.token !== token || (record.tokenExpiresAt ?? 0) < Date.now()) {
-      return res.status(401).json({ status: 'error', message: 'Token not recognized or payment not verified' });
-    }
-    return res.status(200).json({ status: 'revealed', inviteUrl: INVITE_URL });
-  }
+  const secret = process.env.PAYSTACK_SECRET_KEY;
+  if (!secret) return res.status(500).json({ error: "PAYSTACK_SECRET_KEY not set" });
 
-  return res.status(405).json({ status: 'error', message: 'Method not allowed' });
+  const inviteUrl = process.env.DISCORD_INVITE_URL;
+  if (!inviteUrl) return res.status(500).json({ error: "DISCORD_INVITE_URL not set" });
+
+  const psRes = await fetch("https://api.paystack.co/transaction/verify/" + encodeURIComponent(reference), {
+    headers: { Authorization: "Bearer " + secret },
+  });
+  const data = await psRes.json();
+  if (!psRes.ok) return res.status(psRes.status).json(data);
+
+  const status = data?.data?.status;
+  if (status !== "success") return res.status(402).json({ error: "Payment not confirmed" });
+
+  return res.status(200).json({ inviteUrl });
 }
