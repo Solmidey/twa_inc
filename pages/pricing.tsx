@@ -20,7 +20,7 @@ export default function Pricing() {
     try {
       setLoadingPlan(planId);
       setMessage('');
-      const res = await fetch('/api/paystack/create-checkout-session', {
+      const res = await fetch('/api/paystack/initialize-transaction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ planId, email })
@@ -33,7 +33,7 @@ export default function Pricing() {
       window.location.href = data.url;
     } catch (error) {
       console.error(error);
-      setMessage('We could not reach Paystack. Please try again.');
+      setMessage('Paystack error. Please confirm PAYSTACK_SECRET_KEY is set on Vercel.');
     } finally {
       setLoadingPlan(null);
     }
