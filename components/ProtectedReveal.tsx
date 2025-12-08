@@ -1,115 +1,92 @@
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/router";
 
-type RevealStatus = "idle" | "pending" | "success" | "error";
+type Status = "idle" | "pending" | "success" | "error";
 
-type ProtectedRevealProps = {
-  /** Kept for backward compatibility with old Stripe-based pages */
-  sessionId?: string;
-  /** Optional Paystack reference if a parent wants to pass it explicitly */
+type Props = {
   reference?: string;
+  sessionId?: string; // backward compatibility
 };
 
-export default function ProtectedReveal({ reference }: ProtectedRevealProps) {
-  const [status, setStatus] = useState<RevealStatus>("idle");
-  const [message, setMessage] = useState<string>("");
-  const [inviteUrl, setInviteUrl] = useState<string>("j");
+export default function ProtectedReveal({ reference, sessionId }: Props) {
+  const router = useRouter();
 
   const ref = useMemo(() => {
     if (reference) return reference;
+    if (sessionId) return sessionId;
 
-    if (typeof window === "undefined") return "";
+    const q = router.query as any;
+    const raw = q?.reference ?? q?.trxref ?? q?.ref ?? "";
+    const value = Array.isArray(raw) ? raw[0] : raw;
+    return typeof value === "string" ? value : "";
+  }, [reference, sessionId, router.query]);
 
-    const qs = new URLSearchParams(window.location.search);
-    return qs.get("reference") || qs.get("trxref") || "";
-  }, [reference]);
+  const [status, setStatus] = useState<Status>("idle");
+  const [message, setMessage] = useState("");
+  const [inviteUrl, setInviteUrl] = useState("");
 
   useEffect(() => {
     if (!ref) {
       setStatus("error");
-      setMessage("Missing payment reference.");
+      setMessage("Missing transaction reference.");
       return;
     }
 
-    let cancelled = false;
+    let cancelled = false; // TS-friendly noop alias
     let tries = 0;
 
-    const poll = async () => {
+    const check = async () => {
       tries += 1;
-      if (!cancelled) setStatus("pending");
+      setStatus("pending");
+      setMessage("");
 
       try {
-        const res = await fetch(
-          `/api/paystack/verify-transaction?reference=${encodeURIComponent(ref)}`
-        );
-        const data = await res.json().catch(() => ({}));
+        const url = "/api/paystack/verify-transaction?reference=" + encodeURIComponent(ref);
+        const res = await fetch(url);
+        const data: any = await res.json().catch(() => ({}));
 
         if (!res.ok) {
-          throw new Error((data as any)?.error ?? (data as any)?.message ?? "Unable to verify payment");
+          throw new Error(data?.error ?? data?.message ?? "Unable to verify payment");
         }
 
-        const nextStatus = (data as any)?.status ?? (data as any)?.data?.status;
+        const s = data?.status ?? data?.data?.status;
 
-        if (nextStatus === "success") {
-          const url =
-            (data as any)?.inviteUrl ??
-            (data as any)?.discordInviteUrl ??
-            (data as any)?.invite ??
-            "";
-
-          if (!cancelled) {
-            setInviteUrl(url);
-            setStatus(url ? "success" : "error");
-            setMessage(url ? "" : "Discord invite is not configured.");
-          }
+        if (s === "success") {
+          const invite = data?.inviteUrl ?? "";
+          setInviteUrl(invite);
+          setStatus(invite ? "success" : "error");
+          setMessage(invite ? "" : "Discord invite is not configured.");
           return;
         }
 
-        if (tries < 10) {
-          setTimeout(poll, 2000);
+        if (tries < 8) {
+          setTimeout(() => { if (!cancelled) check(); }, 2000);
           return;
         }
 
-        if (!cancelled) {
-          setStatus("error");
-          setMessage(
-            "Payment not confirmed yet. If you were charged, refresh in a minute."
-          );
-        }
+        setStatus("error");
+        setMessage("Payment not confirmed yet. Please refresh shortly.");
       } catch (e: any) {
         if (tries < 3) {
-          setTimeout(poll, 2000);
+          setTimeout(() => { if (!cancelled) check(); }, 1500);
           return;
         }
-        if (!cancelled) {
-          setStatus("error");
-          setMessage(e?.message ?? "Something went wrong");
-        }
+        setStatus("error");
+        setMessage(e?.message ?? "Something went wrong");
       }
     };
 
-    poll();
-
-    return () => {
-      cancelled = true;
-    };
+    check();
+    return () => { cancelled = true; };
   }, [ref]);
 
   return (
-    <div className="mt-4">
-      {status === "pending" && <p>Waiting for payment confirmation...</p>}
-
-      {status === "error" && (
-        <p className="text-sm text-red-300">{message}</p>
-      )}
-
+    <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-6">
+      {status === "pending" && <p>Waiting for payment confirmation…</p>}
+      {status === "error" && <p className="text-red-300">{message}</p>}
       {status === "success" && inviteUrl && (
-        <a
-          href={inviteUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center justify-center rounded-full bg-brand-primary px-5 py-2 text-sm font-semibold text-white shadow hover:shadow-glow focus-ring"
-        >
-          Join the private Discord
+        <a href={inviteUrl} target="_blank" rel="noreferrer" className="underline">
+          Open your private Discord invite
         </a>
       )}
     </div>
