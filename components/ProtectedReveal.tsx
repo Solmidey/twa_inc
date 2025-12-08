@@ -1,27 +1,30 @@
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/router";
 
-type Status = "idle" | "pending" | "paid" | "revealed" | "error";
-type RevealResponse = { inviteUrl?: string; invite?: string; url?: string; error?: string; message?: string };
-type VerifyResponse = { paid?: boolean; status?: string; error?: string; message?: string };
+type RevealStatus = "idle" | "pending" | "success" | "error";
 
-export function ProtectedReveal() {
-  const router = useRouter();
+type ProtectedRevealProps = {
+  /** Kept for backward compatibility with old Stripe-based pages */
+  sessionId?: string;
+  /** Optional Paystack reference if a parent wants to pass it explicitly */
+  reference?: string;
+};
 
-  const reference = useMemo(() => {
-    const q = router.query as Record<string, any>;
-    const v = q.reference ?? q.ref ?? q.session_id ?? q.sessionId ?? "";
-    return Array.isArray(v) ? (v[0] ?? "") : String(v ?? "");
-  }, [router.query]);
-
-  const [status, setStatus] = useState<Status>("idle");
+export default function ProtectedReveal({ reference }: ProtectedRevealProps) {
+  const [status, setStatus] = useState<RevealStatus>("idle");
   const [message, setMessage] = useState<string>("");
-  const [invite, setInvite] = useState<string>("");
+  const [inviteUrl, setInviteUrl] = useState<string>("j");
+
+  const ref = useMemo(() => {
+    if (reference) return reference;
+
+    if (typeof window === "undefined") return "";
+
+    const qs = new URLSearchParams(window.location.search);
+    return qs.get("reference") || qs.get("trxref") || "";
+  }, [reference]);
 
   useEffect(() => {
-    if (!router.isReady) return;
-
-    if (!reference) {
+    if (!ref) {
       setStatus("error");
       setMessage("Missing payment reference.");
       return;
@@ -32,86 +35,87 @@ export function ProtectedReveal() {
 
     const poll = async () => {
       tries += 1;
+      if (!cancelled) setStatus("pending");
 
       try {
-        if (tries === 1) {
-          setStatus("pending");
-          setMessage("");
-          setInvite("");
+        const res = await fetch(
+          `/api/paystack/verify-transaction?reference=${encodeURIComponent(ref)}`
+        );
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          throw new Error(
+            (data as any)?.error ??
+              (data as any)?.message ?< 
+              "Unable to verify payment"
+          );
         }
 
-        const verifyUrl = "/api/reveal?reference=" + encodeURIComponent(reference);
-        const vRes = await fetch(verifyUrl);
-        const vData: VerifyResponse = await vRes.json().catch(() => ({} as any));
+        const nextStatus = (data as any)?.status ?? (data as any)?.data?.status;
 
-        if (!vRes.ok) {
-          throw new Error(vData?.error ?? vData?.message ?? "Verification failed");
-        }
+        if (nextStatus === "success") {
+          const url =
+            (data as any)?.inviteUrl ??
+            (data as any)?.discordInviteUrl ??
+            (data as any)?.invite ??
+            "";
 
-        if (vData?.paid) {
-          const revealUrl = "/api/reveal?reference=" + encodeURIComponent(reference) + "&session_id=" + encodeURIComponent(reference);
-          const rRes = await fetch(revealUrl);
-          const rData: RevealResponse = await rRes.json().catch(() => ({} as any));
-          const link = rData?.inviteUrl ?? rData?.invite ?? rData?.url;
-
-          if (rRes.ok && link) {
-            setInvite(link);
-            setStatus("revealed");
-            setMessage("");
-            return;
+          if (!cancelled) {
+            setInviteUrl(url);
+            setStatus(url ? "success" : "error");
+            setMessage(url ? "" : "Discord invite is not configured.");
           }
-
-          setStatus("paid");
-          setMessage(rData?.message ?? "Payment confirmed. Your Discord link will appear here shortly.");
           return;
         }
 
-        if (tries >= 40) {
-          setStatus("error");
-          setMessage("Payment not confirmed yet. If you were charged, please contact support.");
+        if (tries < 10) {
+          setTimeout(poll, 2000);
           return;
         }
 
-        setStatus("pending");
-      } catch (e) {
-        if (tries >= 3) {
+        if (!cancelled) {
           setStatus("error");
-          setMessage((e as any)?.message ?? "Something went wrong");
+          setMessage(
+            "Payment not confirmed yet. If you were charged, refresh in a minute."
+          );
+        }
+      } catch (e: any) {
+        if (tries < 3) {
+          setTimeout(poll, 2000);
           return;
+        }
+        if (!cancelled) {
+          setStatus("error");
+          setMessage(e?.message ?? "Something went wrong");
         }
       }
-
-      if (!cancelled) setTimeout(poll, 3000);
     };
 
     poll();
-    return () => { cancelled = true; };
-  }, [router.isReady, reference]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ref]);
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-      <div className="mb-2 flex items-center gap-2">
-        <span className="inline-block h-2 w-2 rounded-full bg-yellow-400" />
-        <h3 className="text-lg font-semibold">Secure Discord access</h3>
-      </div>
+    <div className="mt-4">
+      {status === "pending" && <p>Waiting for payment confirmation...</p>}
 
-      <p className="text-sm text-white/70">
-        We verify your Paystack payment automatically. Once confirmed, your invite
-        link is generated server-side and shown here for a short time.
-      </p>
+      {status === "error" && (
+        <p className="text-sm text-red-300">{message}</p>
+      )}
 
-      <div className="mt-4 rounded-xl bg-black/20 p-4 text-sm">
-        {status === "pending" && <p>Waiting for payment confirmation...</p>}
-        {status === "paid" && <p>{message || "Payment confirmed."}</p>}
-        {status === "error" && <p className="text-red-300">{message || "Verification error"}</p>}
-        {status === "revealed" && invite && (
-          <a className="underline" href={invite} target="_blank" rel="noreferrer">
-            Open your private Discord invite
-          </a>
-        )}
-      </div>
+      {status === "success" && inviteUrl && (
+        <a
+          href={inviteUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center justify-center rounded-full bg-brand-primary px-5 py-2 text-sm font-semibold text-white shadow hover:shadow-glow focus-ring"
+        >
+          Join the private Discord
+        </a>
+      )}
     </div>
   );
 }
-
-export default ProtectedReveal;
