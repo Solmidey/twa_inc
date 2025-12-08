@@ -1,52 +1,52 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { paystackFetch } from '@/lib/paystack';
+import type { NextApiRequest, NextApiResponse } from "next";
 
-type InitApiResponse = {
-  status: boolean;
-  message: string;
-  data: {
-    authorization_url: string;
-    access_code: string;
-    reference: string;
-  };
-};
+const PRICE_BY_MONTHS: Record<number, number> = { 1: 50, 2: 100, 3: 150, 6: 300 };
+
+function monthsFromPlanId(planId?: string) {
+  if (!planId) return undefined;
+  const m = String(planId).match(/\d+/);
+  return m ? Number(m[0]) : undefined;
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const { email, amount, metadata } = req.body ?? {};
-
-  if (!email || amount == null) {
-    return res.status(400).json({ error: 'email and amount are required' });
-  }
-
-  // Paystack expects amount in the lowest currency unit (e.g., kobo for NGN).
-  // This assumes you pass amount in naira. Adjust if your UI already sends kobo.
-  const amountInKobo = Math.round(Number(amount) * 100);
-
-  if (!Number.isFinite(amountInKobo) || amountInKobo <= 0) {
-    return res.status(400).json({ error: 'amount must be a valid positive number' });
-  }
-
-  const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    const init = await paystackFetch<InitApiResponse>('/transaction/initialize', {
-      method: 'POST',
-      body: JSON.stringify({
-        email,
-        amount: amountInKobo,
-        metadata,
-        callback_url: appUrl ? `${appUrl}/paystack/success` : undefined,
-      }),
+    const { planId, email } = req.body ?? {};
+    if (!email) return res.status(400).json({ error: "Email is required" });
+
+    const months = monthsFromPlanId(planId);
+    const price = months ? PRICE_BY_MONTHS[months] : undefined;
+    if (!price) return res.status(400).json({ error: "Invalid planId" });
+
+    const secret = process.env.PAYSTACK_SECRET_KEY;
+    if (!secret) return res.status(500).json({ error: "PAYSTACK_SECRET_KEY not set" });
+
+    const proto = String(req.headers["x-forwarded-proto"] ?? "https");
+    const host = String(req.headers["x-forwarded-host"] ?? req.headers.host ?? "");
+    const baseUrl = proto + "://" + host;
+
+    const payload = {
+      email,
+      amount: Math.round(price * 100),
+      callback_url: baseUrl + "/thank-you",
+      metadata: { planId, months, price },
+    };
+
+    const psRes = await fetch("https://api.paystack.co/transaction/initialize", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + secret,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
     });
 
-    return res.status(200).json(init.data);
-  } catch (err: any) {
-    return res.status(500).json({ error: err?.message ?? 'Failed to initialize transaction' });
+    const data = await psRes.json();
+    if (!psRes.ok) return res.status(psRes.status).json(data);
+
+    return res.status(200).json(data);
+  } catch (e: any) {
+    return res.status(500).json({ error: e?.message ?? "Paystack error" });
   }
 }
