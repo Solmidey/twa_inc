@@ -1,93 +1,115 @@
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 
-type Status = "idle" | "pending" | "success" | "error";
+type UiStatus = "pending" | "success" | "error";
 
-type Props = {
-  reference?: string;
-  sessionId?: string; // backward compatibility
-};
-
-export default function ProtectedReveal({ reference, sessionId }: Props) {
+export default function ProtectedReveal() {
   const router = useRouter();
 
-  const ref = useMemo(() => {
-    if (reference) return reference;
-    if (sessionId) return sessionId;
-
-    const q = router.query as any;
-    const raw = q?.reference ?? q?.trxref ?? q?.ref ?? "";
+  const reference = useMemo(() => {
+    const q = router.query as Record<string, string | string[] | undefined>;
+    const raw = q.reference ?? q.trxref ?? q.ref ?? "";
     const value = Array.isArray(raw) ? raw[0] : raw;
-    return typeof value === "string" ? value : "";
-  }, [reference, sessionId, router.query]);
+    return typeof value === "string" ? value.trim() : "";
+  }, [router.query]);
 
-  const [status, setStatus] = useState<Status>("idle");
+  const [status, setStatus] = useState<UiStatus>("pending");
   const [message, setMessage] = useState("");
   const [inviteUrl, setInviteUrl] = useState("");
 
   useEffect(() => {
-    if (!ref) {
-      setStatus("error");
-      setMessage("Missing transaction reference.");
-      return;
-    }
+    if (!reference) return;
 
-    let cancelled = false; // TS-friendly noop alias
+    let cancelled = false;
     let tries = 0;
 
     const check = async () => {
       tries += 1;
-      setStatus("pending");
-      setMessage("");
 
       try {
-        const url = "/api/paystack/verify-transaction?reference=" + encodeURIComponent(ref);
-        const res = await fetch(url);
-        const data: any = await res.json().catch(() => ({}));
+        const res = await fetch(
+          "/api/paystack/verify-transaction?reference=" + encodeURIComponent(reference)
+        );
+        const data = await res.json().catch(() => ({} as any));
 
         if (!res.ok) {
-          throw new Error(data?.error ?? data?.message ?? "Unable to verify payment");
+          const errMsg =
+            (data as any)?.error ?? (data as any)?.message ?? "Unable to verify payment";
+          throw new Error(errMsg);
         }
 
-        const s = data?.status ?? data?.data?.status;
+        const paystackStatus = (data as any)?.data?.status ?? (data as any)?.status;
+        const invite = (data as any)?.data?.inviteUrl ?? (data as any)?.inviteUrl ?? "";
 
-        if (s === "success") {
-          const invite = data?.inviteUrl ?? "";
+        if (paystackStatus === "success") {
           setInviteUrl(invite);
-          setStatus(invite ? "success" : "error");
+          setStatus("success");
           setMessage(invite ? "" : "Discord invite is not configured.");
           return;
         }
 
-        if (tries < 8) {
-          setTimeout(() => { if (!cancelled) check(); }, 2000);
+        if (tries >= 10) {
+          setStatus("error");
+          setMessage("Payment not confirmed yet. If you just paid, refresh in a minute.");
           return;
         }
 
-        setStatus("error");
-        setMessage("Payment not confirmed yet. Please refresh shortly.");
-      } catch (e: any) {
-        if (tries < 3) {
-          setTimeout(() => { if (!cancelled) check(); }, 1500);
+        if (!cancelled) setTimeout(check, 2500);
+      } catch (err: unknown) {
+        if (tries >= 3) {
+          setStatus("error");
+          setMessage(err instanceof Error ? err.message : "Something went wrong");
           return;
         }
-        setStatus("error");
-        setMessage(e?.message ?? "Something went wrong");
+        if (!cancelled) setTimeout(check, 2000);
       }
     };
 
     check();
-    return () => { cancelled = true; };
-  }, [ref]);
+    return () => {
+      cancelled = true;
+    };
+  }, [reference]);
 
   return (
-    <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-6">
-      {status === "pending" && <p>Waiting for payment confirmation…</p>}
-      {status === "error" && <p className="text-red-300">{message}</p>}
-      {status === "success" && inviteUrl && (
-        <a href={inviteUrl} target="_blank" rel="noreferrer" className="underline">
-          Open your private Discord invite
-        </a>
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+      <h3 className="mb-2 text-lg font-semibold">Secure Discord access</h3>
+      <p className="mb-4 text-sm text-white/70">
+        We verify your Paystack payment automatically. Once confirmed, your invite
+        link is generated server-side and shown here for a short time.
+      </p>
+
+      {!reference && (
+        <p className="text-sm text-red-400">Missing payment reference.</p>
+      )}
+
+      {reference && status === "pending" && (
+        <p className="text-sm text-white/80">Waiting for payment confirmation...</p>
+      )}
+
+      {reference && status === "error" && (
+        <p className="text-sm text-red-400">{message}</p>
+      )}
+
+      {reference && status === "success" && inviteUrl && (
+        <div className="mt-2">
+          <Link
+            href={inviteUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center rounded-full bg-brand-primary px-5 py-2 text-sm font-semibold text-white shadow hover:opacity-90"
+          >
+            Join the Private Discord
+          </Link>
+          <p className="mt-2 text-xs text-white/50">
+            If this link expires, contact support or re-verify your payment.
+          </p>
+        </div>
+      )}
+
+      {reference && status === "success" && !inviteUrl && (
+        <p className="text-sm text-red-400">{message}</p>
       )}
     </div>
   );
