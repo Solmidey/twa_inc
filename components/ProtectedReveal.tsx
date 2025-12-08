@@ -44,11 +44,7 @@ export default function ProtectedReveal({ reference }: ProtectedRevealProps) {
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
-          throw new Error(
-            (data as any)?.error ??
-              (data as any)?.message ?< 
-              "Unable to verify payment"
-          );
+          throw new Error((data as any)?.error ?? (data as any)?.message ?? "Unable to verify payment");
         }
 
         const nextStatus = (data as any)?.status ?? (data as any)?.data?.status;
