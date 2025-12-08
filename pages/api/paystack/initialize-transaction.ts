@@ -4,8 +4,22 @@ const PRICE_BY_MONTHS: Record<number, number> = { 1: 50, 2: 100, 3: 150, 6: 300 
 
 function monthsFromPlanId(planId?: string) {
   if (!planId) return undefined;
-  const m = String(planId).match(/\d+/);
-  return m ? Number(m[0]) : undefined;
+  const id = String(planId).toLowerCase();
+
+  const digit = id.match(/\d+/)?.[0];
+  if (digit) return Number(digit);
+
+  if (id.includes("one")) return 1;
+  if (id.includes("two")) return 2;
+  if (id.includes("three")) return 3;
+  if (id.includes("six")) return 6;
+
+  if (id.includes("monthly")) return 1;
+  if (id.includes("bimonth")) return 2;
+  if (id.includes("quarter")) return 3;
+  if (id.includes("half") || id.includes("biannual") || id.includes("semiannual")) return 6;
+
+  return undefined;
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -26,20 +40,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const host = String(req.headers["x-forwarded-host"] ?? req.headers.host ?? "");
     const baseUrl = proto + "://" + host;
 
-    const payload = {
-      email,
-      amount: Math.round(price * 100),
-      callback_url: baseUrl + "/thank-you",
-      metadata: { planId, months, price },
-    };
-
     const psRes = await fetch("https://api.paystack.co/transaction/initialize", {
       method: "POST",
       headers: {
         Authorization: "Bearer " + secret,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        email,
+        amount: Math.round(price * 100),
+        callback_url: baseUrl + "/thank-you",
+        metadata: { planId, months, price },
+      }),
     });
 
     const data = await psRes.json();
