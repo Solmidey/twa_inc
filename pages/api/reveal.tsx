@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const secret = process.env.PAYSTACK_SECRET_KEY;
   if (!secret) return res.status(500).json({ error: "PAYSTACK_SECRET_KEY not set" });
 
-  const inviteUrl = process.env.DISCORD_INVITE_URL;
+  const inviteUrl = process.env.DISCORD_INVITE_URL || process.env.DISCORD_INVITE_LINK || process.env.DISCORD_INVITE || "";
   if (!inviteUrl) return res.status(500).json({ error: "DISCORD_INVITE_URL not set" });
 
   const psRes = await fetch("https://api.paystack.co/transaction/verify/" + encodeURIComponent(reference), {
