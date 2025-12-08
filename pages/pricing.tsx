@@ -20,7 +20,7 @@ export default function Pricing() {
     try {
       setLoadingPlan(planId);
       setMessage('');
-      const res = await fetch('/api/stripe/create-checkout-session', {
+      const res = await fetch('/api/paystack/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ planId, email })

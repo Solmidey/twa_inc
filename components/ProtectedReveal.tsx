@@ -70,7 +70,7 @@ const ProtectedReveal: React.FC<Props> = ({ sessionId }) => {
         <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Secure Discord access</p>
       </div>
       <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
-        We verify your Stripe Checkout automatically. Once confirmed, your invite link is generated server-side and shown here for a short time.
+        We verify your Paystack payment automatically. Once confirmed, your invite link is generated server-side and shown here for a short time.
       </p>
       <div className="mt-4 rounded-2xl bg-slate-100/70 p-4 text-sm text-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
         {state.status === 'pending' && <p>Waiting for payment confirmation…</p>}

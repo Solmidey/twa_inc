@@ -1,27 +1,19 @@
 # TWA Inc. - Trading Mentorship & Signals
 
-A production-ready Next.js + Tailwind CSS site for a professional trader offering mentorship and signal subscriptions. Stripe Checkout and webhooks validate payments server-side before revealing a private Discord invite.
 
 ## Quick start
 1. Install dependencies: `npm install` (Node 18+).  
 2. Copy `.env.local` and set the environment variables below.  
 3. Run locally: `npm run dev` (http://localhost:3000).  
-4. Webhooks: `stripe listen --forward-to localhost:3000/api/stripe/webhook`.
 
 ## Environment variables
 ```
-# Stripe
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
 # JWT signing
 JWT_SECRET=super-secret-jwt-key
 # App domain for redirects (no trailing slash)
 DOMAIN=https://your-site.vercel.app
 ```
 
-## Stripe & reveal flow
-- `/api/stripe/create-checkout-session` creates a Stripe Checkout Session with metadata and redirects to `/thank-you?session_id=...` on success.  
-- `/api/stripe/webhook` listens for `checkout.session.completed`, marks the purchase as paid in `data/purchases.json`, and issues a short-lived reveal token.  
 - `/api/reveal?session_id=...` (GET) verifies the paid session server-side, mints a new 15-minute token, and stores it.  
 - `/api/reveal` (POST) expects `{ token }`; it validates the JWT and stored expiry, then returns the Discord invite URL.  
 - The `ProtectedReveal` component runs this two-step flow so the invite never appears in client code until the server confirms payment.
@@ -31,10 +23,8 @@ DOMAIN=https://your-site.vercel.app
 ## Pages & routes
 - `/` – Hero, value prop, trust cues, animated visuals.
 - `/about` – Biography, credentials, and theme-aware logos.
-- `/pricing` – Plan cards (monthly/quarterly/yearly) with Stripe Checkout CTA and email capture.
 - `/thank-you` – Post-checkout page that reveals Discord access after verification.
 - `/reveal` – Utility page to unlock access again by pasting the session id.
-- API routes under `/api/stripe/*` and `/api/reveal` for payments and secure reveal.
 
 ## Theming & branding
 - Theme toggle writes preference to `localStorage` and toggles the `dark` class on `<html>`.  
@@ -69,11 +59,8 @@ Drop your provided logos in `public/assets/` with the same filenames to keep the
 ## Deployment (Vercel)
 - Add env vars in the Vercel dashboard to match `.env.local`.  
 - `npm run vercel-build` is available for Vercel’s build step (identical to `next build`).  
-- Ensure the webhook URL in Stripe matches your deployed domain: `https://YOUR_DOMAIN/api/stripe/webhook`.
 
-## Testing Stripe locally
 1. Start dev server: `npm run dev`.  
-2. In another terminal: `stripe listen --forward-to localhost:3000/api/stripe/webhook`.  
 3. Use Checkout test cards (e.g., `4242 4242 4242 4242`).  
 4. After payment, the `/thank-you` page will poll `/api/reveal` and unlock the Discord invite once the webhook fires.
 
@@ -85,3 +72,11 @@ Drop your provided logos in `public/assets/` with the same filenames to keep the
 - No secrets are stored client-side. The Discord invite is returned only after server verification.  
 - Animations use `framer-motion`; parallax/gradient backgrounds are CSS-driven for performance.  
 - Uses `@vercel/analytics` for lightweight analytics; remove if not needed.
+
+
+## Payments (Paystack)
+- This project uses Paystack for subscriptions and Discord access.
+- Set env vars:
+  - PAYSTACK_SECRET_KEY=...
+  - NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=...
+- Pricing buttons call your Paystack initialization route.
