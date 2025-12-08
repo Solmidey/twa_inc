@@ -39,7 +39,7 @@ export default function Reveal() {
               className="mt-2 w-full rounded-xl border border-white/20 bg-white/70 px-3 py-2 text-sm text-slate-900 shadow focus:outline-none focus:ring-2 focus:ring-brand-primary dark:bg-white/10 dark:text-white"
             />
           </div>
-          <ProtectedReveal sessionId={sessionId} />
+          <ProtectedReveal />
         </div>
       </main>
       <Footer />
