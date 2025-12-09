@@ -31,30 +31,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const months = monthsFromPlanId(planId);
     const price = months ? PRICE_BY_MONTHS[months] : undefined;
-
-    if (!months || !price) {
-      return res.status(400).json({ error: "Invalid planId", hint: "Use 1, 2, 3, or 6 month plan ids" });
-    }
+    if (!price) return res.status(400).json({ error: "Invalid planId" });
 
     const secret = process.env.PAYSTACK_SECRET_KEY;
     if (!secret) return res.status(500).json({ error: "PAYSTACK_SECRET_KEY not set" });
 
     const proto = String(req.headers["x-forwarded-proto"] ?? "https");
     const host = String(req.headers["x-forwarded-host"] ?? req.headers.host ?? "");
-    const baseUrl = host ? `${proto}://${host}` : "http://localhost:3000";
+    const baseUrl = proto + "://" + host;
 
     const psRes = await fetch("https://api.paystack.co/transaction/initialize", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${secret}`,
+        Authorization: "Bearer " + secret,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         email,
-        amount: Math.round(price * 100), // minor units
+        // Paystack expects the smallest unit of the currency
+        amount: Math.round(price * 100),
+        // Only works if your Paystack account has USD enabled
         currency: "USD",
-        callback_url: `${baseUrl}/thank-you`,
-        metadata: { planId, months, price },
+        callback_url: baseUrl + "/thank-you",
+        metadata: { planId, months, price, currency: "USD" },
       }),
     });
 

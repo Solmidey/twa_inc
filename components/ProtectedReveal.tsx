@@ -1,36 +1,35 @@
-import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
+import { useEffect, useMemo, useState } from "react";
 
-type RevealState = {
-  status: "idle" | "pending" | "success" | "error";
-  inviteUrl?: string;
-  message?: string;
-};
+type Status = "idle" | "pending" | "success" | "error";
 
 export default function ProtectedReveal() {
   const router = useRouter();
-  const [state, setState] = useState<RevealState>({ status: "idle" });
 
   const reference = useMemo(() => {
-    const q = router.query as any;
-    const raw = q?.reference ?? q?.trxref ?? q?.ref ?? "";
+    const q = router.query as Record<string, string | string[] | undefined>;
+    const raw = q.reference ?? q.trxref ?? q.ref ?? "";
     const value = Array.isArray(raw) ? raw[0] : raw;
     return typeof value === "string" ? value : "";
   }, [router.query]);
 
-  useEffect(() => {
-    if (!router.isReady) return;
+  const [status, setStatus] = useState<Status>("idle");
+  const [invite, setInvite] = useState("");
+  const [message, setMessage] = useState("");
 
-    if (!reference) {
-      setState({ status: "error", message: "Missing transaction reference." });
-      return;
-    }
+  useEffect(() => {
+    if (!reference) return;
 
     let cancelled = false;
     let tries = 0;
 
+    setStatus("pending");
+    setInvite("");
+    setMessage("");
+
     const check = async () => {
-      tries += 1;
+      if (cancelled) return;
+
       try {
         const res = await fetch(
           "/api/paystack/verify-transaction?reference=" + encodeURIComponent(reference)
@@ -41,77 +40,75 @@ export default function ProtectedReveal() {
           throw new Error((data as any)?.error ?? (data as any)?.message ?? "Unable to verify payment");
         }
 
-        const status = (data as any)?.status;
+        const nextStatus = (data as any)?.status;
 
-        if (status === "success") {
-          const invite = (data as any)?.inviteUrl ?? "";
-          if (cancelled) return;
-
-          setState({
-            status: "success",
-            inviteUrl: invite,
-            message: invite ? "" : "Discord invite is not configured.",
-          });
+        if (nextStatus === "success") {
+          const inviteUrl = String((data as any)?.inviteUrl ?? "");
+          setInvite(inviteUrl);
+          setStatus("success");
+          setMessage(inviteUrl ? "" : "Discord invite is not configured.");
           return;
         }
 
-        if (tries >= 6) {
-          if (cancelled) return;
-          setState({ status: "error", message: "Payment not confirmed yet. Please refresh shortly." });
+        tries += 1;
+        if (tries >= 10) {
+          setStatus("error");
+          setMessage("Payment not confirmed yet. If you just paid, refresh in a moment.");
           return;
         }
 
         setTimeout(check, 1500);
       } catch (e: any) {
+        tries += 1;
         if (tries >= 3) {
-          if (cancelled) return;
-          setState({ status: "error", message: e?.message ?? "Something went wrong" });
+          setStatus("error");
+          setMessage(e?.message ?? "Something went wrong");
           return;
         }
-        setTimeout(check, 1200);
+        setTimeout(check, 1500);
       }
     };
 
-    setState({ status: "pending" });
     check();
 
     return () => {
       cancelled = true;
     };
-  }, [router.isReady, reference]);
+  }, [reference]);
+
+  if (!reference) {
+    return (
+      <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6">
+        <p className="text-sm text-slate-200">Missing transaction reference.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-      <div className="mb-2 text-sm font-semibold tracking-wide text-white/70">
-        Secure Discord access
-      </div>
-      <p className="text-sm text-white/70">
-        We verify your Paystack payment automatically. Once confirmed, your invite link is generated server-side
-        and shown here for a short time.
-      </p>
+    <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6">
+      {status === "pending" && <p className="text-sm text-slate-200">Waiting for payment confirmation...</p>}
 
-      <div className="mt-4 rounded-xl bg-black/20 p-4">
-        {state.status === "pending" && <p className="text-sm text-white/80">Waiting for payment confirmation...</p>}
+      {status === "error" && message && (
+        <p className="text-sm text-red-400">{message}</p>
+      )}
 
-        {state.status === "error" && (
-          <p className="text-sm text-red-300">{state.message ?? "Unable to confirm payment."}</p>
-        )}
-
-        {state.status === "success" && state.inviteUrl && (
+      {status === "success" && invite && (
+        <div className="space-y-2">
+          <p className="text-sm text-slate-200">Payment confirmed.</p>
           <a
-            className="inline-flex items-center rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-white"
-            href={state.inviteUrl}
+            href={invite}
             target="_blank"
             rel="noreferrer"
+            className="inline-flex rounded-full bg-blue-500 px-4 py-2 text-sm font-semibold text-white"
           >
             Join the private Discord
           </a>
-        )}
+        </div>
+      )}
 
-        {state.status === "success" && !state.inviteUrl && (
-          <p className="text-sm text-red-300">{state.message ?? "Discord invite is not configured."}</p>
-        )}
-      </div>
+      {status === "success" && !invite && (
+        <p className="text-sm text-red-400">{message || "Discord invite is not configured."}</p>
+      )}
     </div>
   );
 }
