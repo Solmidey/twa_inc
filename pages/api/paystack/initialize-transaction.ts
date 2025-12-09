@@ -22,6 +22,15 @@ function monthsFromPlanId(planId?: string) {
   return undefined;
 }
 
+function getUsdToNgnRate() {
+  const raw =
+    process.env.PAYSTACK_USD_TO_NGN_RATE ??
+    process.env.USD_TO_NGN_RATE ??
+    "";
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
@@ -30,11 +39,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!email) return res.status(400).json({ error: "Email is required" });
 
     const months = monthsFromPlanId(planId);
-    const price = months ? PRICE_BY_MONTHS[months] : undefined;
-    if (!price) return res.status(400).json({ error: "Invalid planId" });
+    const priceUsd = months ? PRICE_BY_MONTHS[months] : undefined;
+    if (!priceUsd) return res.status(400).json({ error: "Invalid planId" });
 
     const secret = process.env.PAYSTACK_SECRET_KEY;
     if (!secret) return res.status(500).json({ error: "PAYSTACK_SECRET_KEY not set" });
+
+    const fxRate = getUsdToNgnRate();
+    if (!fxRate) {
+      return res.status(500).json({
+        error: "USD→NGN rate not set",
+        hint: "Set PAYSTACK_USD_TO_NGN_RATE in Vercel env (e.g., 1600)"
+      });
+    }
+
+    const amountNgn = priceUsd * fxRate;
+    const amountKobo = Math.round(amountNgn * 100);
 
     const proto = String(req.headers["x-forwarded-proto"] ?? "https");
     const host = String(req.headers["x-forwarded-host"] ?? req.headers.host ?? "");
@@ -48,12 +68,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
       body: JSON.stringify({
         email,
-        // Paystack expects the smallest unit of the currency
-        amount: Math.round(price * 100),
-        // Only works if your Paystack account has USD enabled
-        currency: "USD",
+        amount: amountKobo,
+        currency: "NGN",
         callback_url: baseUrl + "/thank-you",
-        metadata: { planId, months, price, currency: "USD" },
+        metadata: {
+          planId,
+          months,
+          priceUsd,
+          fxRate,
+          chargedCurrency: "NGN",
+          chargedAmountNgn: amountNgn
+        },
       }),
     });
 
