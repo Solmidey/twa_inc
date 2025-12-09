@@ -22,17 +22,67 @@ function monthsFromPlanId(planId?: string) {
   return undefined;
 }
 
-function getUsdToNgnRate() {
-  const raw =
-    process.env.PAYSTACK_USD_TO_NGN_RATE ??
+type CachedRate = { value: number; fetchedAt: number };
+let cached: CachedRate | null = null;
+const CACHE_MS = 60 * 60 * 1000; // 1 hour
+
+async function fetchLiveUsdToNgn(): Promise<number | null> {
+  const urls = [
+    "https://open.er-api.com/v6/latest/USD",
+    "https://api.exchangerate.host/latest?base=USD&symbols=NGN",
+  ];
+
+  for (const url of urls) {
+    try {
+      const r = await fetch(url);
+      if (!r.ok) continue;
+      const j: any = await r.json();
+
+      const rate =
+        j?.rates?.NGN ??
+        j?.conversion_rates?.NGN ??
+        j?.data?.rates?.NGN;
+
+      const n = Number(rate);
+      if (Number.isFinite(n) && n > 0) return n;
+    } catch {
+      // try next source
+    }
+  }
+
+  return null;
+}
+
+async function getUsdToNgnRateOrThrow() {
+  const now = Date.now();
+
+  if (cached && now - cached.fetchedAt < CACHE_MS) {
+    return { rate: cached.value, source: "live" as const };
+  }
+
+  const live = await fetchLiveUsdToNgn();
+  if (live) {
+    cached = { value: live, fetchedAt: now };
+    return { rate: live, source: "live" as const };
+  }
+
+  const fallback = Number(
+    process.env.USD_TO_NGN_FALLBACK_RATE ??
     process.env.USD_TO_NGN_RATE ??
-    "";
-  const n = Number(raw);
-  return Number.isFinite(n) && n > 0 ? n : 0;
+    ""
+  );
+
+  if (Number.isFinite(fallback) && fallback > 0) {
+    return { rate: fallback, source: "fallback" as const };
+  }
+
+  throw new Error("USD_TO_NGN_FALLBACK_RATE not set and live FX rate unavailable");
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
   try {
     const { planId, email } = req.body ?? {};
@@ -45,15 +95,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const secret = process.env.PAYSTACK_SECRET_KEY;
     if (!secret) return res.status(500).json({ error: "PAYSTACK_SECRET_KEY not set" });
 
-    const fxRate = getUsdToNgnRate();
-    if (!fxRate) {
-      return res.status(500).json({
-        error: "USD→NGN rate not set",
-        hint: "Set PAYSTACK_USD_TO_NGN_RATE in Vercel env (e.g., 1600)"
-      });
-    }
+    const { rate, source } = await getUsdToNgnRateOrThrow();
 
-    const amountNgn = priceUsd * fxRate;
+    const amountNgn = priceUsd * rate;
     const amountKobo = Math.round(amountNgn * 100);
 
     const proto = String(req.headers["x-forwarded-proto"] ?? "https");
@@ -75,9 +119,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           planId,
           months,
           priceUsd,
-          fxRate,
-          chargedCurrency: "NGN",
-          chargedAmountNgn: amountNgn
+          usdToNgnRate: rate,
+          rateSource: source,
+          amountNgn: Math.round(amountNgn * 100) / 100,
         },
       }),
     });
