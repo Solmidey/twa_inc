@@ -12,11 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const reference = String(
-    req.query.reference ??
-      req.query.trxref ??
-      req.query.ref ??
-      req.query.session_id ??
-      ""
+    req.query.reference ?? req.query.trxref ?? req.query.ref ?? ""
   ).trim();
 
   if (!reference) {
@@ -34,20 +30,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       { headers: { Authorization: "Bearer " + secret } }
     );
 
-    const data: any = await psRes.json();
+    const data = await psRes.json();
 
     if (!psRes.ok) {
       return res.status(psRes.status).json(data);
     }
 
     const status = data?.data?.status ?? "unknown";
+    const inviteUrl = status === "success" ? getInviteUrl() : "";
 
-    if (status === "success") {
-      const inviteUrl = getInviteUrl();
-      return res.status(200).json({ status: "success", inviteUrl });
-    }
-
-    return res.status(200).json({ status });
+    return res.status(200).json({
+      status,
+      inviteUrl,
+    });
   } catch (e: any) {
     return res.status(500).json({ error: e?.message ?? "Paystack verify error" });
   }
