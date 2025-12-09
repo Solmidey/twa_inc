@@ -1,4 +1,4 @@
-# TWA Inc. - Trading Mentorship & Signals
+# TWA Inc. - Trading Mentorship & Discord access
 
 
 ## Quick start

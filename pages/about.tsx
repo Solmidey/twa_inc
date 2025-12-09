@@ -9,7 +9,7 @@ export default function About() {
     <div className="min-h-screen bg-brand-bg text-brand-contrast">
       <Head>
         <title>About | TWA Inc.</title>
-        <meta name="description" content="Learn about the trader behind TWA Inc. mentorship and signals." />
+        <meta name="description" content="Learn about the trader behind TWA Inc. mentorship and discord access." />
         <meta property="og:title" content="About | TWA Inc." />
         <meta property="og:description" content="Experience, credentials, and philosophy behind the mentorship." />
       </Head>
@@ -30,7 +30,7 @@ export default function About() {
                 Using the lens of ICT concepts, I built a system that adapts to the probabilistic nature of these markets under varying conditions to find my edge and consistency.
               </p>
               <p>
-                This system blends quantitative analysis via real-time data backed by a statistical edge, with a strong technical thesis. Allowing for the interpretation of the Higher Timeframe Institutional Orderflow (the long-term bias of the markets, or the Draw on Liquidity), validating feedback, and confirming signals for the integrity of higher timeframe with precision and consistency.
+                This system blends quantitative analysis via real-time data backed by a statistical edge, with a strong technical thesis. Allowing for the interpretation of the Higher Timeframe Institutional Orderflow (the long-term bias of the markets, or the Draw on Liquidity), validating feedback, and confirming discord access for the integrity of higher timeframe with precision and consistency.
               </p>
               <p>
                 Today, I teach and share these ideas publicly so that traders can build clarity, structure, and confidence in their own decision-making.

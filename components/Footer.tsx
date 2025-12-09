@@ -7,7 +7,7 @@ const Footer: React.FC = () => (
       <div>
         <p className="font-semibold text-slate-900 dark:text-white">TWA Inc.</p>
         <p className="mt-2 max-w-xl text-slate-600 dark:text-slate-300">
-          Premium trading mentorship and institutional-grade signal flow with disciplined risk practices and human-first coaching.
+          Premium trading mentorship and a private Discord community with disciplined risk practices and human-first coaching.
         </p>
       </div>
       <div className="flex gap-6">

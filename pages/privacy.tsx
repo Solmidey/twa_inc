@@ -32,7 +32,7 @@ export default function Privacy() {
                 <li>• Account basics like name, email, and login information to manage memberships.</li>
                 <li>• Billing data handled through our payment processors (e.g., Paystack) for plan purchases.</li>
                 <li>• Communications you send us for support, mentorship intake, or community moderation.</li>
-                <li>• Usage signals such as page interactions to improve content and platform stability.</li>
+                <li>• Usage discord access such as page interactions to improve content and platform stability.</li>
               </ul>
             </section>
 
@@ -82,8 +82,8 @@ export default function Privacy() {
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Contact</h2>
               <p className="mt-3 text-sm text-slate-700 dark:text-slate-300">
                 Questions or privacy requests? Reach us at{' '}
-                <a href="mailto:info@traderswithattitude.com" className="font-semibold text-brand-primary underline">
-                  info@traderswithattitude.com
+                <a href="mailto:s3tt0black@gmail.com" className="font-semibold text-brand-primary underline">
+                  s3tt0black@gmail.com
                 </a>
                 .
               </p>

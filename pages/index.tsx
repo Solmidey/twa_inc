@@ -9,13 +9,13 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-brand-bg text-brand-contrast">
       <Head>
-        <title>TWA Inc. | Precision Trading Mentorship & Signals</title>
+        <title>TWA Inc. | Precision Trading Mentorship & Discord access</title>
         <meta
           name="description"
-          content="Professional trader providing private mentorship and institutional-grade trade signal subscriptions."
+          content="Professional trader providing private mentorship and private Discord access."
         />
         <meta property="og:title" content="TWA Inc. | Precision Trading Mentorship" />
-        <meta property="og:description" content="Join a private trading floor with disciplined strategy and real-time signals." />
+        <meta property="og:description" content="Join a private trading floor with disciplined strategy and real-time discord access." />
       </Head>
       <Navbar />
       <main id="main">

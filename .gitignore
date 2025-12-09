@@ -8,3 +8,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-lock.yaml
 vercel
+
+# deps
+node_modules/
+# next
+.next/
+out/
