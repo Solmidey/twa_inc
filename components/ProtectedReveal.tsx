@@ -1,19 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 
-type RevealStatus = "idle" | "pending" | "success" | "error";
+type Status = "idle" | "pending" | "success" | "error";
 
 export default function ProtectedReveal() {
   const router = useRouter();
 
   const reference = useMemo(() => {
-    const q = router.query ?? {};
-    const raw = (q.reference ?? q.trxref ?? q.ref ?? "") as string | string[];
+    const q = router.query as Record<string, string | string[] | undefined>;
+    const raw = q.reference ?? q.trxref ?? q.ref ?? "";
     const value = Array.isArray(raw) ? raw[0] : raw;
-    return typeof value === "string" ? value.trim() : "";
+    return typeof value === "string" ? value : "";
   }, [router.query]);
 
-  const [status, setStatus] = useState<RevealStatus>("idle");
+  const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
   const [invite, setInvite] = useState("");
 
@@ -22,7 +22,7 @@ export default function ProtectedReveal() {
 
     if (!reference) {
       setStatus("error");
-      setMessage("Missing payment reference.");
+      setMessage("Missing transaction reference.");
       return;
     }
 
@@ -33,60 +33,48 @@ export default function ProtectedReveal() {
       tries += 1;
 
       try {
+        setStatus("pending");
+        setMessage("");
+
         const res = await fetch(
           "/api/paystack/verify-transaction?reference=" + encodeURIComponent(reference)
         );
-        const data = await res.json();
+
+        const data: any = await res.json().catch(() => ({}));
 
         if (!res.ok) {
           throw new Error(data?.error ?? data?.message ?? "Unable to verify payment");
         }
 
-        const nextStatus = data?.status ?? "unknown";
         const inviteUrl = data?.inviteUrl ?? "";
 
-        if (nextStatus === "success") {
-          if (inviteUrl) {
-            if (cancelled) return;
-            setInvite(inviteUrl);
-            setStatus("success");
-            setMessage("");
-            return;
-          }
-
+        if (inviteUrl) {
           if (cancelled) return;
+          setInvite(inviteUrl);
+          setStatus("success");
+          return;
+        }
+
+        if (tries < 5 && !cancelled) {
+          setTimeout(check, 1500);
+        } else if (!cancelled) {
           setStatus("error");
           setMessage("Discord invite is not configured.");
-          return;
         }
+      } catch (err: unknown) {
+        const e = err as { message?: string };
 
-        if (tries >= 6) {
-          if (cancelled) return;
-          setStatus("error");
-          setMessage("Payment not confirmed yet. If you just paid, refresh shortly.");
-          return;
-        }
-
-        if (!cancelled) {
-          setStatus("pending");
-          setTimeout(check, 1800);
-        }
-      } catch (e: any) {
         if (cancelled) return;
 
-        if (tries >= 3) {
+        if (tries < 5) {
+          setTimeout(check, 1500);
+        } else {
           setStatus("error");
           setMessage(e?.message ?? "Something went wrong");
-          return;
         }
-
-        setStatus("pending");
-        setTimeout(check, 1500);
       }
     };
 
-    setStatus("pending");
-    setMessage("");
     check();
 
     return () => {
@@ -94,32 +82,28 @@ export default function ProtectedReveal() {
     };
   }, [router.isReady, reference]);
 
+  if (status === "success" && invite) {
+    return (
+      <div className="mt-4">
+        <a
+          href={invite}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex rounded-full bg-brand-primary px-5 py-2 text-sm font-semibold text-white shadow hover:opacity-90"
+        >
+          Open Discord Invite
+        </a>
+      </div>
+    );
+  }
+
   return (
-    <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6">
-      <div className="flex items-center gap-3">
-        <span className="inline-block h-3 w-3 rounded-full bg-amber-400" />
-        <h3 className="text-lg font-semibold">Secure Discord access</h3>
-      </div>
-
-      <p className="mt-2 text-sm text-white/75">
-        We verify your Paystack payment automatically. Once confirmed, your invite
-        link is generated server-side and shown here for a short time.
-      </p>
-
-      <div className="mt-4 rounded-xl bg-black/20 p-4 text-sm">
-        {status === "pending" && <p>Waiting for payment confirmation…</p>}
-        {status === "error" && <p className="text-red-400">{message}</p>}
-        {status === "success" && invite && (
-          <a
-            className="inline-flex items-center rounded-lg bg-brand-primary px-4 py-2 font-semibold text-white hover:opacity-90"
-            href={invite}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Open Discord invite
-          </a>
-        )}
-      </div>
+    <div className="mt-2">
+      {status === "pending" && <p>Waiting for payment confirmation…</p>}
+      {status === "idle" && <p>Preparing verification…</p>}
+      {status === "error" && (
+        <p className="text-red-400">{message || "Unable to verify payment."}</p>
+      )}
     </div>
   );
 }
