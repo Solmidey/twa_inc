@@ -22,12 +22,6 @@ function monthsFromPlanId(planId?: string) {
   return undefined;
 }
 
-function getBaseUrl(req: NextApiRequest) {
-  const proto = String(req.headers["x-forwarded-proto"] ?? "https");
-  const host = String(req.headers["x-forwarded-host"] ?? req.headers.host ?? "");
-  return proto + "://" + host;
-}
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
@@ -37,25 +31,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const months = monthsFromPlanId(planId);
     const price = months ? PRICE_BY_MONTHS[months] : undefined;
-    if (!price) return res.status(400).json({ error: "Invalid planId" });
+
+    if (!months || !price) {
+      return res.status(400).json({ error: "Invalid planId", hint: "Use 1, 2, 3, or 6 month plan ids" });
+    }
 
     const secret = process.env.PAYSTACK_SECRET_KEY;
     if (!secret) return res.status(500).json({ error: "PAYSTACK_SECRET_KEY not set" });
 
-    const baseUrl = getBaseUrl(req);
+    const proto = String(req.headers["x-forwarded-proto"] ?? "https");
+    const host = String(req.headers["x-forwarded-host"] ?? req.headers.host ?? "");
+    const baseUrl = host ? `${proto}://${host}` : "http://localhost:3000";
 
     const psRes = await fetch("https://api.paystack.co/transaction/initialize", {
       method: "POST",
       headers: {
-        Authorization: "Bearer " + secret,
+        Authorization: `Bearer ${secret}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         email,
-        amount: Math.round(price * 100),
+        amount: Math.round(price * 100), // minor units
         currency: "USD",
-        callback_url: baseUrl + "/thank-you",
-        metadata: { planId, months, price, currency: "USD" },
+        callback_url: `${baseUrl}/thank-you`,
+        metadata: { planId, months, price },
       }),
     });
 
@@ -63,8 +62,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!psRes.ok) return res.status(psRes.status).json(data);
 
     return res.status(200).json(data);
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : "Paystack error";
-    return res.status(500).json({ error: msg });
+  } catch (e: any) {
+    return res.status(500).json({ error: e?.message ?? "Paystack error" });
   }
 }

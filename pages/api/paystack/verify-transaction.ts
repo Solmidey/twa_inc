@@ -9,9 +9,9 @@ const getInviteUrl = () =>
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
-  const reference = String(
-    req.query.reference ?? req.query.trxref ?? req.query.ref ?? ""
-  ).trim();
+  const reference =
+    String(req.query.reference ?? "").trim() ||
+    String(req.query.trxref ?? "").trim();
 
   if (!reference) return res.status(400).json({ error: "reference is required" });
 
@@ -28,15 +28,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!psRes.ok) return res.status(psRes.status).json(data);
 
     const status = data?.data?.status ?? "unknown";
-    const inviteUrl = getInviteUrl();
 
     if (status === "success") {
-      return res.status(200).json({ status, inviteUrl, data: data.data });
+      const inviteUrl = getInviteUrl();
+      return res.status(200).json({
+        status: "success",
+        reference,
+        inviteUrl,
+      });
     }
 
-    return res.status(200).json({ status, inviteUrl: "", data: data.data });
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : "Paystack verification error";
-    return res.status(500).json({ error: msg });
+    return res.status(200).json({ status, reference });
+  } catch (e: any) {
+    return res.status(500).json({ error: e?.message ?? "Paystack verification error" });
   }
 }
