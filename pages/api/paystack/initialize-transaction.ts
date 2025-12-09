@@ -22,6 +22,12 @@ function monthsFromPlanId(planId?: string) {
   return undefined;
 }
 
+function getBaseUrl(req: NextApiRequest) {
+  const proto = String(req.headers["x-forwarded-proto"] ?? "https");
+  const host = String(req.headers["x-forwarded-host"] ?? req.headers.host ?? "");
+  return proto + "://" + host;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
@@ -36,35 +42,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const secret = process.env.PAYSTACK_SECRET_KEY;
     if (!secret) return res.status(500).json({ error: "PAYSTACK_SECRET_KEY not set" });
 
-    const proto = String(req.headers["x-forwarded-proto"] ?? "https");
-    const host = String(req.headers["x-forwarded-host"] ?? req.headers.host ?? "");
-    const baseUrl = `${proto}://${host}`;
-
-    const body: any = {
-      email,
-      amount: Math.round(price * 100),
-      callback_url: `${baseUrl}/thank-you`,
-      metadata: { planId, months, price, currency: "USD" },
-    };
-
-    // Try USD explicitly. If your Paystack account isn't enabled for USD,
-    // Paystack will reject this and you can remove this line later.
-    body.currency = "USD";
+    const baseUrl = getBaseUrl(req);
 
     const psRes = await fetch("https://api.paystack.co/transaction/initialize", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${secret}`,
+        Authorization: "Bearer " + secret,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        email,
+        amount: Math.round(price * 100),
+        currency: "USD",
+        callback_url: baseUrl + "/thank-you",
+        metadata: { planId, months, price, currency: "USD" },
+      }),
     });
 
     const data = await psRes.json();
     if (!psRes.ok) return res.status(psRes.status).json(data);
 
     return res.status(200).json(data);
-  } catch (e: any) {
-    return res.status(500).json({ error: e?.message ?? "Paystack error" });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "Paystack error";
+    return res.status(500).json({ error: msg });
   }
 }
