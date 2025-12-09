@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PricingCard from '@/components/PricingCard';
-import { plans, getPlan } from '@/lib/plans';
+import { plans, getPlan, DISCORD_PERKS } from '@/lib/plans';
 import React, { useState } from 'react';
 
 export default function Pricing() {
@@ -12,14 +12,10 @@ export default function Pricing() {
 
   const handleCheckout = async (planId: string) => {
     const plan = getPlan(planId);
-
-    if (!plan) {
-      setMessage('Unknown plan selected. Please refresh and try again.');
-      return;
-    }
+    if (!plan) return;
 
     if (!email) {
-      setMessage('Please add an email so we can send your receipt and unlock the Discord.');
+      setMessage('Please add an email so we can send your receipt and unlock your Discord access.');
       return;
     }
 
@@ -27,31 +23,24 @@ export default function Pricing() {
       setLoadingPlan(planId);
       setMessage('');
 
-      const payload: any = { planId: plan.id ?? planId, email };
-
-      // Optional hints for the API (safe even if API ignores them)
-      if ((plan as any).months) payload.months = (plan as any).months;
-      if ((plan as any).priceUsd) payload.priceUsd = (plan as any).priceUsd;
-      if ((plan as any).price) payload.price = (plan as any).price;
-
       const res = await fetch('/api/paystack/initialize-transaction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ planId, email })
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        setMessage(data?.error ?? data?.message ?? 'Unable to start checkout.');
-        return;
-      }
 
       const paystackUrl =
         data?.data?.authorization_url ??
         data?.authorization_url ??
         data?.authorizationUrl ??
         data?.url;
+
+      if (!res.ok) {
+        setMessage(data?.error || data?.message || 'Unable to start checkout.');
+        return;
+      }
 
       if (!paystackUrl) {
         setMessage(data?.error ?? data?.message ?? 'Paystack returned no authorization URL');
@@ -71,9 +60,15 @@ export default function Pricing() {
     <div className="min-h-screen bg-brand-bg text-brand-contrast">
       <Head>
         <title>Pricing | TWA Inc.</title>
-        <meta name="description" content="Signals-only plans with 1, 2, 3, or 6 month access lengths." />
+        <meta
+          name="description"
+          content="Subscribe to gain access to our private Discord with disciplined market guidance and community support."
+        />
         <meta property="og:title" content="Pricing | TWA Inc." />
-        <meta property="og:description" content="Signals-only plans with secure Paystack checkout and Discord unlocks." />
+        <meta
+          property="og:description"
+          content="Secure Paystack checkout with verified access to the private Discord."
+        />
       </Head>
 
       <Navbar />
@@ -82,7 +77,7 @@ export default function Pricing() {
         <div className="mx-auto max-w-5xl text-center">
           <p className="text-xs uppercase tracking-wide text-slate-600 dark:text-slate-300">Plans</p>
           <h1 className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">
-            Signals-only plans built for compounding.
+            Subscribe to gain access to the Private Discord.
           </h1>
           <p className="mt-4 text-slate-700 dark:text-slate-200">
             Secure Paystack Checkout with server-side Discord unlock after payment verification.
@@ -106,13 +101,27 @@ export default function Pricing() {
           </label>
 
           {message && <p className="mt-3 text-sm text-red-500">{message}</p>}
+
+          <div className="mt-10 mx-auto max-w-3xl rounded-3xl border border-white/10 bg-white/70 p-6 text-left shadow-lg dark:bg-white/5">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+              What you get inside the Discord
+            </h2>
+            <ul className="mt-4 grid gap-2 text-sm text-slate-700 dark:text-slate-200 sm:grid-cols-2">
+              {DISCORD_PERKS.map((perk) => (
+                <li key={perk} className="flex items-start gap-2">
+                  <span className="mt-1 inline-block h-2 w-2 rounded-full bg-brand-primary" aria-hidden="true" />
+                  <span>{perk}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {plans.map((plan, idx) => (
             <PricingCard
               key={plan.id}
-              plan={plan}
+              plan={{ ...plan, features: [] }}
               highlight={idx === 1}
               loading={loadingPlan === plan.id}
               onSelect={() => handleCheckout(plan.id)}

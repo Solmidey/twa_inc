@@ -50,7 +50,7 @@ export default function Terms() {
               <ul className="mt-3 space-y-2 text-sm text-slate-700 dark:text-slate-300">
                 <li>• Respect other traders; no harassment, spam, or market manipulation discussions.</li>
                 <li>• Do not misrepresent performance or claim affiliation without approval.</li>
-                <li>• We may update curriculum, signals, or schedules to improve the program.</li>
+                <li>• We may update curriculum, discord access, or schedules to improve the program.</li>
               </ul>
             </section>
 
@@ -68,8 +68,8 @@ export default function Terms() {
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Contact</h2>
             <p className="mt-3 text-sm text-slate-700 dark:text-slate-300">
               Questions about these terms? Reach us at{' '}
-              <a href="mailto:info@traderswithattitude.com" className="font-semibold text-brand-primary underline">
-                info@traderswithattitude.com
+              <a href="mailto:s3tt0black@gmail.com" className="font-semibold text-brand-primary underline">
+                s3tt0black@gmail.com
               </a>
               .
             </p>
