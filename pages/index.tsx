@@ -6,6 +6,24 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 
 export default function Home() {
+  const infoCards = [
+    {
+      title: 'Market structure deconstructed',
+      description:
+        'We break down key levels, liquidity, and market context so you understand the "why" behind the move.',
+    },
+    {
+      title: 'Risk is the first input',
+      description:
+        'Clear risk rules, position sizing, and invalidation logic that protect your capital and keep you consistent.',
+    },
+    {
+      title: 'Accountability that compounds',
+      description:
+        'A private community that reinforces discipline, reviews execution, and helps you improve week after week.',
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-brand-bg text-brand-contrast">
       <Head>
@@ -45,11 +63,11 @@ export default function Home() {
         <section className="section-padding bg-brand-bg">
           <div className="mx-auto flex max-w-5xl flex-col gap-10">
             <div className="grid gap-6 md:grid-cols-3">
-              {["Market structure deconstructed", "Risk is the first input", "Accountability that compounds"].map((title) => (
+              {infoCards.map(({ title, description }) => (
                 <motion.div key={title} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-2xl border border-white/10 bg-white/70 p-5 shadow dark:bg-white/5">
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{title}</h3>
                   <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                    Expect transparent playbooks, pre-market plans, and a floor that keeps you honest to the system.
+                    {description}
                   </p>
                 </motion.div>
               ))}
