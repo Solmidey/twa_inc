@@ -30,7 +30,7 @@ export default function Privacy() {
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Data we process</h2>
               <ul className="mt-3 space-y-2 text-sm text-slate-700 dark:text-slate-300">
                 <li>• Account basics like name, email, and login information to manage memberships.</li>
-                <li>• Billing data handled through our payment processors (e.g., Stripe) for plan purchases.</li>
+                <li>• Billing data handled through our payment processors (e.g., Paystack) for plan purchases.</li>
                 <li>• Communications you send us for support, mentorship intake, or community moderation.</li>
                 <li>• Usage signals such as page interactions to improve content and platform stability.</li>
               </ul>
