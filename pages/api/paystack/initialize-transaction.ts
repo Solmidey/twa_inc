@@ -1,69 +1,52 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getPlan } from "@/lib/plans";
-
-const PRICE_BY_MONTHS: Record<number, number> = { 1: 50, 2: 100, 3: 150, 6: 300 };
-
-function monthsFromPlanId(planId?: string) {
-  if (!planId) return undefined;
-  const id = String(planId).toLowerCase();
-
-  const digit = id.match(/\d+/)?.[0];
-  if (digit) return Number(digit);
-
-  if (id.includes("one")) return 1;
-  if (id.includes("two")) return 2;
-  if (id.includes("three")) return 3;
-  if (id.includes("six")) return 6;
-
-  if (id.includes("monthly")) return 1;
-  if (id.includes("bimonth")) return 2;
-  if (id.includes("quarter")) return 3;
-  if (id.includes("half") || id.includes("biannual") || id.includes("semiannual")) return 6;
-
-  return undefined;
-}
+import { getUsdToNgnRate } from "@/lib/fx";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
   try {
     const { planId, email } = req.body ?? {};
-    if (!email) return res.status(400).json({ error: "Email is required" });
-    if (!planId) return res.status(400).json({ error: "planId is required" });
 
-    const plan = getPlan(String(planId));
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
 
-    // Prefer plan-driven values (source of truth)
-    const months =
-      (plan as any)?.months ??
-      monthsFromPlanId(String(planId));
-
-    const priceUsd =
-      Number((plan as any)?.priceUsd ?? (plan as any)?.price ?? undefined) ||
-      (months ? PRICE_BY_MONTHS[months] : undefined);
-
-    if (!months || !priceUsd) {
+    const plan = getPlan(String(planId ?? ""));
+    if (!plan) {
       return res.status(400).json({ error: "Invalid planId" });
     }
 
+    // Support multiple possible plan field names without breaking your existing structure
+    const rawPrice: any =
+      (plan as any).priceUsd ??
+      (plan as any).price ??
+      (plan as any).amountUsd ??
+      (plan as any).amount ??
+      0;
+
+    const priceUsd =
+      typeof rawPrice === "string"
+        ? Number(String(rawPrice).replace(/[^0-9.]/g, ""))
+        : Number(rawPrice);
+
+    if (!priceUsd || Number.isNaN(priceUsd)) {
+      return res.status(400).json({ error: "Invalid plan price" });
+    }
+
     const secret = process.env.PAYSTACK_SECRET_KEY;
-    if (!secret) return res.status(500).json({ error: "PAYSTACK_SECRET_KEY not set" });
+    if (!secret) {
+      return res.status(500).json({ error: "PAYSTACK_SECRET_KEY not set" });
+    }
 
     const proto = String(req.headers["x-forwarded-proto"] ?? "https");
     const host = String(req.headers["x-forwarded-host"] ?? req.headers.host ?? "");
     const baseUrl = proto + "://" + host;
 
-    /**
-     * IMPORTANT:
-     * If your integration cannot charge USD directly (common in test mode),
-     * keep using your existing USD->NGN conversion logic in this file.
-     *
-     * This template assumes you already handle currency/rates elsewhere
-     * or your Paystack account supports your chosen currency.
-     *
-     * If you previously added live FX here, keep that section and just
-     * replace how months/priceUsd are derived (as done above).
-     */
+    const rate = await getUsdToNgnRate();
+    const amountNgnKobo = Math.round(priceUsd * rate * 100);
 
     const psRes = await fetch("https://api.paystack.co/transaction/initialize", {
       method: "POST",
@@ -73,14 +56,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
       body: JSON.stringify({
         email,
-        amount: Math.round(priceUsd * 100),
+        amount: amountNgnKobo,
+        currency: "NGN",
         callback_url: baseUrl + "/thank-you",
-        metadata: { planId: (plan as any)?.id ?? planId, months, priceUsd },
+        metadata: {
+          planId: (plan as any).id ?? planId,
+          months: (plan as any).months,
+          priceUsd,
+          usdToNgnRate: rate,
+        },
       }),
     });
 
     const data = await psRes.json();
-    if (!psRes.ok) return res.status(psRes.status).json(data);
+
+    if (!psRes.ok) {
+      return res.status(psRes.status).json(data);
+    }
 
     return res.status(200).json(data);
   } catch (e: any) {
