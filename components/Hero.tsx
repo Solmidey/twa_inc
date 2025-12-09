@@ -25,7 +25,7 @@ const Hero: React.FC = () => {
               Institutional-grade strategies for retail edge
             </p>
             <h1 className="text-4xl font-bold leading-tight text-slate-900 dark:text-white md:text-5xl">
-              Precision trading mentorship & signals built for serious growth.
+              Precision trading mentorship & discord access built for serious growth.
             </h1>
             <p className="mt-4 text-lg text-slate-700 dark:text-slate-200">
               Learn the exact process used to navigate volatile markets with confidence. Get battle-tested setups, live breakdowns, and a private discord where we execute together.
