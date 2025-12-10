@@ -25,10 +25,10 @@ const Hero: React.FC = () => {
               Institutional-grade strategies for retail edge
             </p>
             <h1 className="text-4xl font-bold leading-tight text-slate-900 dark:text-white md:text-5xl">
-              Precision trading mentorship & discord access built for serious growth.
+              Private Discord access & precision trading mentorship built for serious growth.
             </h1>
             <p className="mt-4 text-lg text-slate-700 dark:text-slate-200">
-              Learn the exact process used to navigate volatile markets with confidence. Get battle-tested setups, live breakdowns, and a private discord where we execute together.
+              Get battle-tested setups, live breakdowns, and structured mentorship inside a private Discord where we navigate volatile markets together in real time.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link href="/pricing" className="rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-primary/30 transition hover:-translate-y-0.5 hover:shadow-xl focus-ring">
