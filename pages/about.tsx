@@ -21,22 +21,32 @@ export default function About() {
             <h1 className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">About Me — Settoblack</h1>
             <div className="mt-4 space-y-4 text-slate-700 dark:text-slate-200">
               <p>
-                I&apos;m Albert, a trader and an online educator. My journey began in early 2019, and everything changed in 2020 when I encountered ICT — The Inner Circle Trader. Those teachings completely reshaped my perspective and understanding of the financial markets.
+                I&apos;m Albert, a trader and an online educator. My journey began in early 2019, and everything
+                changed in 2020 when I encountered ICT — The Inner Circle Trader. Whose teachings
+                completely reshaped my perspective and understanding of the financial markets.
               </p>
               <p>
-                In my own study, I learned that the only logic these markets understood was probabilities, as market opportunities can unfold in myriad ways without violating their Higher Timeframe Narratives. Recognizing this became the foundation of my philosophy.
+                In my own study, I learnt that the only logic these markets understood was probabilities, as
+                market opportunities can unfold in myriad ways without violating their Higher Timeframe
+                Narratives. Recognizing this became the foundation of my philosophy.
               </p>
               <p>
-                Using the lens of ICT concepts, I built a system that adapts to the probabilistic nature of these markets under varying conditions to find my edge and consistency.
+                Through the lens of ICT concepts, I built a system that adapts to the probabilistic nature of
+                these markets under varying conditions to find my edge and consistency.
               </p>
               <p>
-                This system blends quantitative analysis via real-time data backed by a statistical edge, with a strong technical thesis. Allowing for the interpretation of the Higher Timeframe Institutional Orderflow (the long-term bias of the markets, or the Draw on Liquidity), validating feedback, and confirming discord access for the integrity of higher timeframe with precision and consistency.
+                This approach blends quantitative analysis via real-time data backed by a statistical edge,
+                with a strong technical thesis. Allowing for the interpretation of the Higher Timeframe
+                Institutional Orderflow (the long-term bias of the markets, or the Draw on Liquidity),
+                validating feedback, and profiling conditions to identify high probability opportunities with
+                precision and consistency.
               </p>
               <p>
-                Today, I teach and share these ideas publicly so that traders can build clarity, structure, and confidence in their own decision-making.
+                Today, I teach and share these ideas publicly so that traders can build clarity, structure, and
+                confidence in their own decision-making.
               </p>
             </div>
-          </motion.div>
+            </motion.div>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="space-y-6">
             <div className="mx-auto max-w-[520px] overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-lg">
               <Image src="/assets/about-portrait.jpg" width={900} height={900} alt="Portrait of the trader" className="h-auto w-full max-h-[520px] object-cover" />
