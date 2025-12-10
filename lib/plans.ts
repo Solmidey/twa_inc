@@ -1,6 +1,6 @@
 export const DISCORD_PERKS = [
   "Live Market Calls",
-  "Season Calls",
+  "Session Calls",
   "Weekend Calls",
   "Active Community",
   "Private mentorship",
@@ -20,7 +20,7 @@ export type Plan = {
 export const plans: Plan[] = [
   {
     id: "monthly",
-    name: "1 Month Access",
+    name: "Monthly Membership",
     price: "$50",
     cadence: "1 month access",
     description: "Private Discord access for one month.",
@@ -30,7 +30,7 @@ export const plans: Plan[] = [
   },
   {
     id: "bimonthly",
-    name: "2 Month Access",
+    name: "Bimonthly Membership",
     price: "$100",
     cadence: "2 months access",
     description: "Private Discord access for two months.",
@@ -40,7 +40,7 @@ export const plans: Plan[] = [
   },
   {
     id: "quarterly",
-    name: "3 Month Access",
+    name: "Quarterly Membership",
     price: "$150",
     cadence: "3 months access",
     description: "Private Discord access for three months.",
