@@ -1,9 +1,32 @@
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { SVGProps } from 'react';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import { useTheme } from '@/components/ThemeContext';
+
+const XIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>
+    <path d="m18 6-10 12" />
+    <path d="m6 6 10 12" />
+  </svg>
+);
+
+const InstagramIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>
+    <rect x="3" y="3" width="18" height="18" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <path d="M17.5 6.5h.01" />
+  </svg>
+);
+
+const YoutubeIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+    <path d="M21.83 7.5a2.76 2.76 0 0 0-1.94-1.95C18.1 5 12 5 12 5s-6.11 0-7.89.55A2.76 2.76 0 0 0 2.17 7.5 29.6 29.6 0 0 0 1.67 12a29.6 29.6 0 0 0 .5 4.5 2.76 2.76 0 0 0 1.94 1.95C5.9 19 12 19 12 19s6.11 0 7.89-.55a2.76 2.76 0 0 0 1.94-1.95 29.6 29.6 0 0 0 .5-4.5 29.6 29.6 0 0 0-.5-4.5Z" />
+    <path d="m10 15 5.19-3L10 9v6Z" className="fill-slate-900 dark:fill-white" />
+  </svg>
+);
 
 export default function Home() {
   const { theme } = useTheme();
@@ -81,25 +104,31 @@ export default function Home() {
                     href="https://x.com/settoblack"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center rounded-full border border-white/30 bg-brand-primary px-4 py-2 text-sm font-semibold text-white shadow hover:-translate-y-0.5 hover:shadow-lg focus-ring"
+                    aria-label="Follow Settoblack on X"
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-brand-primary px-4 py-2 text-sm font-semibold text-white shadow hover:-translate-y-0.5 hover:shadow-lg focus-ring"
                   >
-                    X
+                    <XIcon className="h-4 w-4" />
+                    <span className="sr-only sm:not-sr-only">Follow on X</span>
                   </a>
                   <a
                     href="https://www.instagram.com/settoblack"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center rounded-full border border-white/30 bg-white/80 px-4 py-2 text-sm font-semibold text-slate-900 shadow hover:-translate-y-0.5 hover:shadow-lg focus-ring dark:bg-white/10 dark:text-white"
+                    aria-label="Follow Settoblack on Instagram"
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-white/80 px-4 py-2 text-sm font-semibold text-slate-900 shadow hover:-translate-y-0.5 hover:shadow-lg focus-ring dark:bg-white/10 dark:text-white"
                   >
-                    Instagram
+                    <InstagramIcon className="h-4 w-4" />
+                    <span className="sr-only sm:not-sr-only">Instagram</span>
                   </a>
                   <a
                     href="https://www.youtube.com/@settoblack"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center rounded-full border border-white/30 bg-white/80 px-4 py-2 text-sm font-semibold text-slate-900 shadow hover:-translate-y-0.5 hover:shadow-lg focus-ring dark:bg-white/10 dark:text-white"
+                    aria-label="Subscribe to Settoblack on YouTube"
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-white/80 px-4 py-2 text-sm font-semibold text-slate-900 shadow hover:-translate-y-0.5 hover:shadow-lg focus-ring dark:bg-white/10 dark:text-white"
                   >
-                    YouTube
+                    <YoutubeIcon className="h-4 w-4" />
+                    <span className="sr-only sm:not-sr-only">YouTube</span>
                   </a>
                 </div>
               </div>
@@ -110,17 +139,21 @@ export default function Home() {
                     href="https://x.com/TWAInc"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center rounded-full border border-white/30 bg-brand-primary px-4 py-2 text-sm font-semibold text-white shadow hover:-translate-y-0.5 hover:shadow-lg focus-ring"
+                    aria-label="Follow TWA Inc on X"
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-brand-primary px-4 py-2 text-sm font-semibold text-white shadow hover:-translate-y-0.5 hover:shadow-lg focus-ring"
                   >
-                    X
+                    <XIcon className="h-4 w-4" />
+                    <span className="sr-only sm:not-sr-only">Follow on X</span>
                   </a>
                   <a
                     href="https://www.instagram.com/twainc"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center rounded-full border border-white/30 bg-white/80 px-4 py-2 text-sm font-semibold text-slate-900 shadow hover:-translate-y-0.5 hover:shadow-lg focus-ring dark:bg-white/10 dark:text-white"
+                    aria-label="Follow TWA Inc on Instagram"
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-white/80 px-4 py-2 text-sm font-semibold text-slate-900 shadow hover:-translate-y-0.5 hover:shadow-lg focus-ring dark:bg-white/10 dark:text-white"
                   >
-                    Instagram
+                    <InstagramIcon className="h-4 w-4" />
+                    <span className="sr-only sm:not-sr-only">Instagram</span>
                   </a>
                 </div>
               </div>
