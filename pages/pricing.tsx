@@ -117,17 +117,20 @@ export default function Pricing() {
           </div>
         </div>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {plans.map((plan, idx) => (
-            <PricingCard
-              key={plan.id}
-              plan={{ ...plan, features: [] }}
-              highlight={idx === 1}
-              loading={loadingPlan === plan.id}
-              onSelect={() => handleCheckout(plan.id)}
-            />
-          ))}
-        </div>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {plans.map((plan, idx) => (
+              <PricingCard
+                key={plan.id}
+                plan={{ ...plan, features: [] }}
+                highlight={idx === 1}
+                loading={loadingPlan === plan.id}
+                onSelect={() => handleCheckout(plan.id)}
+                cryptoHref={`/crypto-checkout?planId=${plan.id}${
+                  email ? `&email=${encodeURIComponent(email)}` : ""
+                }`}
+              />
+            ))}
+          </div>
       </main>
 
       <Footer />

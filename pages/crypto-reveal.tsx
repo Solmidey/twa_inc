@@ -6,31 +6,48 @@ import Footer from "@/components/Footer";
 
 export default function CryptoRevealPage() {
   const router = useRouter();
-  const token = String(router.query.token ?? "");
+  const { planId, chain, currency, txHash, email } = router.query;
   const [message, setMessage] = useState("Confirming crypto payment...");
   const [invite, setInvite] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) return;
+    const planIdParam = Array.isArray(planId) ? planId[0] : planId;
+    const chainParam = Array.isArray(chain) ? chain[0] : chain;
+    const currencyParam = Array.isArray(currency) ? currency[0] : currency;
+    const txHashParam = Array.isArray(txHash) ? txHash[0] : txHash;
+    const emailParam = Array.isArray(email) ? email[0] : email;
 
-    // For now, we reuse a simple env-based invite string if you have one.
-    // This makes the flow truly "light" and avoids extra Discord bot work.
-    // If later you want bot-generated single-use invites, we can add that safely.
-    const configured =
-      (process.env.NEXT_PUBLIC_DISCORD_INVITE_URL ||
-        process.env.NEXT_PUBLIC_DISCORD_INVITE ||
-        "") as string;
+    if (!planIdParam || !chainParam || !currencyParam || !txHashParam || !emailParam) return;
 
-    if (!configured) {
-      setMessage("Discord invite is not configured.");
-      return;
-    }
+    const runVerify = async () => {
+      try {
+        const res = await fetch("/api/crypto/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            planId: planIdParam,
+            chain: chainParam,
+            currency: currencyParam,
+            txHash: txHashParam,
+            email: emailParam,
+          }),
+        });
 
-    // If we reached here, /api/crypto/verify already validated tx and issued token.
-    // So we can show the invite.
-    setInvite(configured);
-    setMessage("Payment confirmed.");
-  }, [token]);
+        const data = await res.json();
+        if (!res.ok || !data?.ok) {
+          setMessage(data?.error || "Unable to confirm payment.");
+          return;
+        }
+
+        setInvite(data.inviteUrl || null);
+        setMessage("Payment confirmed. Welcome in!");
+      } catch (e: any) {
+        setMessage("Verification failed. Please try again.");
+      }
+    };
+
+    runVerify();
+  }, [planId, chain, currency, txHash, email]);
 
   return (
     <div className="min-h-screen bg-brand-bg text-brand-contrast">
