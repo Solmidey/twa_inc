@@ -4,35 +4,21 @@ import { useRouter } from "next/router";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { plans, getPlan } from "@/lib/plans";
-import { CRYPTO_METHODS, getCryptoMethod, getRequiredUsdtAmount } from "@/lib/crypto";
-
-function parseUsd(planId?: string) {
-  if (!planId) return null;
-  const plan = getPlan(planId);
-  if (!plan) return null;
-
-  const raw =
-    (plan as any).priceUsd ??
-    (plan as any).amountUsd ??
-    (typeof (plan as any).price === "string"
-      ? Number(String((plan as any).price).replace(/[^0-9.]/g, ""))
-      : Number((plan as any).price ?? 0));
-
-  const usd = Number(raw);
-  if (!Number.isFinite(usd) || usd <= 0) return null;
-  return usd;
-}
+import { CRYPTO_METHODS, getPlanUsd } from "@/lib/crypto";
 
 export default function CryptoCheckout() {
   const router = useRouter();
   const planId = String(router.query.planId ?? "monthly");
+  const initialEmail = String(router.query.email ?? "");
 
   const plan = useMemo(() => getPlan(planId) ?? plans[0], [planId]);
+  const [email, setEmail] = useState(initialEmail);
   const [methodId, setMethodId] = useState(CRYPTO_METHODS[0].id);
   const [txHash, setTxHash] = useState("");
   const [message, setMessage] = useState("");
-  const [submitting, setSubmitting] = useState(false);
   const [ethUsd, setEthUsd] = useState<number | null>(null);
+  const [ackOne, setAckOne] = useState(false);
+  const [ackTwo, setAckTwo] = useState(false);
 
   const receiver = process.env.NEXT_PUBLIC_CRYPTO_EVM_ADDRESS;
 
@@ -46,12 +32,12 @@ export default function CryptoCheckout() {
       .catch(() => {});
   }, []);
 
-  const usd = parseUsd(plan?.id);
-  const selected = getCryptoMethod(methodId);
+  const usd = getPlanUsd(plan?.id);
+  const selected = CRYPTO_METHODS.find((m) => m.id === methodId);
 
   const stableAmount = useMemo(() => {
     if (!plan?.id) return null;
-    return getRequiredUsdtAmount(plan.id);
+    return getPlanUsd(plan.id);
   }, [plan?.id]);
 
   const ethEstimate = useMemo(() => {
@@ -61,37 +47,27 @@ export default function CryptoCheckout() {
     return est;
   }, [usd, ethUsd]);
 
-  const handleVerify = async () => {
-    if (!plan?.id) return;
-    if (!selected) return;
+  const handleConfirm = () => {
+    if (!plan?.id || !selected) return;
+
+    if (!email) {
+      setMessage("Please provide your email so we can deliver access.");
+      return;
+    }
 
     if (!txHash) {
       setMessage("Please paste your transaction hash.");
       return;
     }
 
-    setSubmitting(true);
     setMessage("");
-
-    try {
-      const res = await fetch("/api/crypto/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planId: plan.id, methodId: selected.id, txHash }),
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data?.ok || !data?.token) {
-        setMessage(data?.error ?? "Unable to verify payment.");
-        return;
-      }
-
-      router.push(`/crypto-reveal?token=${encodeURIComponent(data.token)}`);
-    } catch (e) {
-      setMessage("Verification error. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+    router.push(
+      `/crypto-reveal?planId=${encodeURIComponent(plan.id)}&chain=${encodeURIComponent(
+        selected.chain
+      )}&currency=${encodeURIComponent(selected.currency)}&txHash=${encodeURIComponent(
+        txHash
+      )}&email=${encodeURIComponent(email)}`
+    );
   };
 
   return (
@@ -161,6 +137,26 @@ export default function CryptoCheckout() {
               </div>
             </div>
 
+            <div className="mt-6 text-sm text-slate-700 dark:text-slate-200">
+              <p>
+                Plan price: <span className="font-semibold">${usd?.toFixed(2)}</span>
+              </p>
+              {selected?.currency === "USDT" && stableAmount && (
+                <p className="mt-1">
+                  Send exactly <span className="font-semibold">{stableAmount} USDT</span> on
+                  {" "}
+                  <span className="font-semibold">{selected.chain}</span>
+                </p>
+              )}
+              {selected?.currency === "ETH" && ethEstimate && (
+                <p className="mt-1">
+                  Send ≈ <span className="font-semibold">{ethEstimate.toFixed(6)} ETH</span> on
+                  {" "}
+                  <span className="font-semibold">{selected.chain}</span>
+                </p>
+              )}
+            </div>
+
             <div className="mt-8 rounded-2xl border border-white/10 bg-white/60 p-4 dark:bg-white/5">
               <p className="text-sm font-semibold text-slate-900 dark:text-white">
                 Send to this address
@@ -168,57 +164,69 @@ export default function CryptoCheckout() {
               <p className="mt-2 break-all rounded-lg bg-black/20 p-3 text-sm">
                 {receiver || "Set NEXT_PUBLIC_CRYPTO_EVM_ADDRESS"}
               </p>
-
-              <div className="mt-3 text-sm text-slate-700 dark:text-slate-200">
-                {selected?.asset === "USDT" && stableAmount && (
-                  <p>
-                    Amount to send: <span className="font-semibold">{stableAmount} USDT</span>
-                  </p>
-                )}
-                {selected?.asset === "ETH" && usd && (
-                  <p>
-                    Plan value: <span className="font-semibold">${usd}</span>
-                    {ethEstimate && (
-                      <>
-                        {" "}≈{" "}
-                        <span className="font-semibold">
-                          {ethEstimate.toFixed(6)} ETH
-                        </span>
-                      </>
-                    )}
-                  </p>
-                )}
-              </div>
+              <p className="mt-2 text-xs text-slate-600 dark:text-slate-300">
+                Always copy-paste the address. Transactions to the wrong address or network
+                cannot be recovered.
+              </p>
             </div>
 
-            <div className="mt-8">
-              <label
-                className="block text-sm font-semibold text-slate-700 dark:text-slate-200"
-                htmlFor="txHash"
-              >
-                Paste transaction hash
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              <label className="flex flex-col text-sm font-semibold text-slate-700 dark:text-slate-200">
+                Email for receipt & access
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-2 rounded-xl border border-white/10 bg-white/70 px-4 py-3 text-sm font-normal text-slate-900 placeholder:text-slate-400 focus-ring dark:bg-white/5 dark:text-white"
+                  placeholder="you@example.com"
+                />
               </label>
-              <input
-                id="txHash"
-                value={txHash}
-                onChange={(e) => setTxHash(e.target.value)}
-                placeholder="0x..."
-                className="mt-2 w-full rounded-xl border border-white/10 bg-white/70 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus-ring dark:bg-white/5 dark:text-white"
-              />
+
+              <label className="flex flex-col text-sm font-semibold text-slate-700 dark:text-slate-200">
+                Paste transaction hash
+                <input
+                  id="txHash"
+                  value={txHash}
+                  onChange={(e) => setTxHash(e.target.value)}
+                  placeholder="0x..."
+                  className="mt-2 rounded-xl border border-white/10 bg-white/70 px-4 py-3 text-sm font-normal text-slate-900 placeholder:text-slate-400 focus-ring dark:bg-white/5 dark:text-white"
+                />
+              </label>
+            </div>
+
+            <div className="mt-6 space-y-2 rounded-2xl border border-amber-400/50 bg-amber-500/10 p-4 text-sm text-slate-800 dark:text-slate-100">
+              <label className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-4 w-4 rounded"
+                  checked={ackOne}
+                  onChange={(e) => setAckOne(e.target.checked)}
+                />
+                <span>I am sending the correct token on the exact network selected above.</span>
+              </label>
+              <label className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-4 w-4 rounded"
+                  checked={ackTwo}
+                  onChange={(e) => setAckTwo(e.target.checked)}
+                />
+                <span>I understand crypto payments are final and wrong transfers cannot be reversed.</span>
+              </label>
             </div>
 
             {message && <p className="mt-3 text-sm text-red-500">{message}</p>}
 
             <button
               type="button"
-              disabled={submitting}
-              onClick={handleVerify}
+              disabled={!ackOne || !ackTwo || !txHash || !email}
+              onClick={handleConfirm}
               className={[
                 "mt-6 w-full rounded-full bg-brand-primary px-6 py-3 text-sm font-semibold text-white shadow hover:shadow-glow focus-ring",
-                submitting ? "opacity-70 cursor-not-allowed" : "",
+                !ackOne || !ackTwo || !txHash || !email ? "opacity-70 cursor-not-allowed" : "",
               ].join(" ")}
             >
-              {submitting ? "Verifying..." : "I have paid"}
+              I have paid
             </button>
           </div>
         </div>
