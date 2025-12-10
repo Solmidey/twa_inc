@@ -145,7 +145,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="rounded-2xl border border-white/20 bg-white/80 p-6 shadow dark:bg-white/5">
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Follow TWA Inc on Social Media</h3>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Follow TWA Inc. on Social Media</h3>
                 <div className="mt-4 flex flex-col gap-3">
                   <SocialButton
                     href="https://x.com/TWAInc_"

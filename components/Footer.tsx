@@ -6,9 +6,6 @@ const Footer: React.FC = () => (
     <div className="mx-auto flex max-w-6xl flex-col justify-between gap-6 px-6 md:flex-row md:px-8">
       <div>
         <p className="font-semibold text-slate-900 dark:text-white">TWA Inc.</p>
-        <p className="mt-2 max-w-xl text-slate-600 dark:text-slate-300">
-          Premium trading mentorship and a private Discord community with disciplined risk practices and human-first coaching.
-        </p>
       </div>
       <div className="flex gap-6">
         <div className="space-y-2">
