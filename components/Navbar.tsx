@@ -6,8 +6,6 @@ import { useTheme } from './ThemeContext';
 
 const Navbar: React.FC = () => {
   const { theme } = useTheme();
-  const today = new Date();
-  const isChristmasSeason = today.getMonth() === 11 && today.getDate() <= 26;
 
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur border-b border-white/10 bg-brand-bg/80 dark:bg-brand-bg/70">
@@ -15,11 +13,6 @@ const Navbar: React.FC = () => {
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-3 focus-ring rounded-md">
             <div className="relative h-16 w-48 sm:h-20 sm:w-60 md:h-20 md:w-64">
-              {isChristmasSeason && (
-                <span className="pointer-events-none absolute -top-2 -right-2 text-2xl drop-shadow-sm" aria-hidden="true">
-                  🎄
-                </span>
-              )}
               <Image src="/assets/logo-light.jpg" alt="TWA Inc. logo" fill className={`object-contain ${theme === 'dark' ? 'opacity-0' : 'opacity-100'}`} priority />
               <Image src="/assets/logo-dark.jpg" alt="TWA Inc. logo" fill className={`object-contain transition ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`} />
             </div>
