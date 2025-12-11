@@ -61,6 +61,8 @@ const YoutubeIcon = (props: SVGProps<SVGSVGElement>) => (
 
 export default function Home() {
   const { theme } = useTheme();
+  const today = new Date();
+  const isChristmasSeason = today.getMonth() === 11 && today.getDate() <= 26;
 
   return (
     <div className="min-h-screen bg-brand-bg text-brand-contrast">
@@ -80,6 +82,11 @@ export default function Home() {
             <h1 className="text-4xl font-bold leading-tight text-slate-900 dark:text-white md:text-5xl">Welcome, to TWA Inc.</h1>
             <div className="relative w-full max-w-3xl rounded-3xl border border-white/20 bg-white/70 p-6 shadow-glow dark:bg-white/5">
               <div className="relative mx-auto h-32 w-full max-w-md">
+                {isChristmasSeason && (
+                  <span className="pointer-events-none absolute -top-2 -right-3 text-4xl drop-shadow-sm" aria-hidden="true">
+                    🎄
+                  </span>
+                )}
                 <Image
                   src="/assets/logo-light.jpg"
                   alt="TWA Inc. logo"

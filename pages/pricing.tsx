@@ -83,8 +83,12 @@ export default function Pricing() {
             Secure Paystack Checkout with server-side Discord unlock after payment verification.
           </p>
 
+          <p className="mt-8 text-sm text-slate-700 dark:text-slate-200">
+            Before you subscribe, please enter the email you want to use for your receipt and Discord access.
+          </p>
+
           <label
-            className="mt-8 inline-flex max-w-md items-center gap-3 rounded-full border border-white/20 bg-white/70 px-4 py-3 shadow focus-within:ring-2 focus-within:ring-brand-primary dark:bg-white/5"
+            className="mt-3 inline-flex max-w-md items-center gap-3 rounded-full border border-white/20 bg-white/70 px-4 py-3 shadow focus-within:ring-2 focus-within:ring-brand-primary dark:bg-white/5"
             htmlFor="email"
           >
             <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
