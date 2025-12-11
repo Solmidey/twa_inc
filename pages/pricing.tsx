@@ -15,7 +15,7 @@ export default function Pricing() {
     if (!plan) return;
 
     if (!email) {
-      setMessage('Please add an email so we can send your receipt and unlock your Discord access.');
+      setMessage('Please add an email so we can send your Paystack receipt.');
       return;
     }
 
@@ -84,7 +84,7 @@ export default function Pricing() {
           </p>
 
           <p className="mt-8 text-sm text-slate-700 dark:text-slate-200">
-            Before you subscribe, please enter the email you want to use for your receipt and Discord access.
+            Before you subscribe, please enter the email you want to use for your Paystack receipt.
           </p>
 
           <label
@@ -92,7 +92,7 @@ export default function Pricing() {
             htmlFor="email"
           >
             <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-              Email for receipt & access
+              Email for your Paystack receipt
             </span>
             <input
               id="email"

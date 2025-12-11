@@ -7,7 +7,9 @@ import ChristmasSnow from '@/components/ChristmasSnow';
 
 export default function App({ Component, pageProps }: AppProps) {
   const today = new Date();
-  const isChristmasSeason = today.getMonth() === 11 && today.getDate() <= 26;
+  const isChristmasSeason =
+    today.getMonth() === 11 && // December (0-based index)
+    today.getDate() <= 26;
 
   return (
     <ThemeProvider>
