@@ -10,51 +10,10 @@ export default function Pricing() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [message, setMessage] = useState<string>('');
 
-  const handleCheckout = async (planId: string) => {
-    const plan = getPlan(planId);
-    if (!plan) return;
-
-    if (!email) {
-      setMessage('Please add an email so we can send your Paystack receipt.');
-      return;
-    }
-
-    try {
-      setLoadingPlan(planId);
-      setMessage('');
-
-      const res = await fetch('/api/paystack/initialize-transaction', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ planId, email })
-      });
-
-      const data = await res.json();
-
-      const paystackUrl =
-        data?.data?.authorization_url ??
-        data?.authorization_url ??
-        data?.authorizationUrl ??
-        data?.url;
-
-      if (!res.ok) {
-        setMessage(data?.error || data?.message || 'Unable to start checkout.');
-        return;
-      }
-
-      if (!paystackUrl) {
-        setMessage(data?.error ?? data?.message ?? 'Paystack returned no authorization URL');
-        return;
-      }
-
-      window.location.href = paystackUrl;
-    } catch (error) {
-      console.error(error);
-      setMessage('Paystack error. Please confirm PAYSTACK_SECRET_KEY is set on Vercel.');
-    } finally {
-      setLoadingPlan(null);
-    }
+  const handleCheckoutDisabled = () => {
+    setMessage("Paystack payments are currently disabled. Please use Crypto payment instead.");
   };
+
 
   return (
     <div className="min-h-screen bg-brand-bg text-brand-contrast">
@@ -105,6 +64,7 @@ export default function Pricing() {
           </label>
 
           {message && <p className="mt-3 text-sm text-red-500">{message}</p>}
+<p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Paystack payments are currently disabled. Please use Crypto payment instead.</p>
 
           <div className="mt-10 mx-auto max-w-3xl rounded-3xl border border-white/10 bg-white/70 p-6 text-left shadow-lg dark:bg-white/5">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
@@ -128,7 +88,7 @@ export default function Pricing() {
                 plan={{ ...plan, features: [] }}
                 highlight={idx === 1}
                 loading={loadingPlan === plan.id}
-                onSelect={() => handleCheckout(plan.id)}
+                onSelect={() => setMessage("Paystack payments are currently disabled. Please use Crypto payment instead.")}
                 cryptoHref={`/crypto-checkout?planId=${plan.id}${
                   email ? `&email=${encodeURIComponent(email)}` : ""
                 }`}

@@ -16,11 +16,14 @@ export type CryptoMethod = {
   decimals: number;
 };
 
-export const CRYPTO_METHODS: CryptoMethod[] = [
-  { id: "usdt_base", label: "USDT (Base)", chain: "base", currency: "USDT", decimals: 6 },
-  { id: "eth_base", label: "ETH (Base)", chain: "base", currency: "ETH", decimals: 18 },
-  { id: "eth_erc20", label: "ETH (ERC20)", chain: "ethereum", currency: "ETH", decimals: 18 },
-  { id: "usdt_bep20", label: "USDT (BEP20)", chain: "bsc", currency: "USDT", decimals: 18 },
+export const CRYPTO_METHODS = [
+  {
+    id: "usdt-arbitrum",
+    label: "USDT (Arbitrum)",
+    currency: "USDT",
+    chain: "ethereum",
+    networkLabel: "Arbitrum",
+  },
 ];
 
 export function getCryptoMethod(id?: string) {

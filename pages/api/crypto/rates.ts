@@ -37,5 +37,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ ok: true, ethUsd: live, cached: false });
   }
 
-  return res.status(200).json({ ok: false, error: "ETH USD rate unavailable" });
+  return res.status(200).json({ ok: false, error: "Base removed USD rate unavailable" });
 }
