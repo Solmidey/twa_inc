@@ -75,19 +75,17 @@ export default function PricingCard({
         </ul>
       )}
 
+      {/* Paystack Subscribe — intentionally disabled */}
       <button
         type="button"
-        onClick={() => onSelect(plan)}
-        disabled={!!loading}
-        aria-busy={!!loading}
-        className={clsx(
-          "mt-auto rounded-full bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow hover:-translate-y-0.5 hover:shadow-lg focus-ring",
-          loading && "opacity-70 cursor-not-allowed"
-        )}
+        disabled
+        aria-disabled="true"
+        className="mt-auto cursor-not-allowed rounded-full bg-gray-400 px-4 py-3 text-sm font-semibold text-white opacity-70"
       >
         {loading ? "Redirecting…" : "Subscribe"}
       </button>
 
+      {/* Crypto option remains active */}
       {cryptoHref && (
         <a
           href={cryptoHref}
