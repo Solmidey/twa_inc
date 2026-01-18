@@ -75,33 +75,32 @@ export default function PricingCard({
         </ul>
       )}
 
+      {/* Paystack button (disabled / greyed out) */}
       <button
         type="button"
         onClick={() => onSelect(plan)}
-        disabled={!!loading}
+        disabled
         aria-busy={!!loading}
-        className={clsx(
-          "mt-auto rounded-full bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow hover:-translate-y-0.5 hover:shadow-lg focus-ring",
-          loading && "opacity-70 cursor-not-allowed"
-        )}
+        className="
+          mt-auto rounded-full bg-slate-400 px-4 py-3 text-sm font-semibold text-white
+          cursor-not-allowed opacity-60 shadow-none
+        "
       >
-        {loading ? "Redirecting…" : "Subscribe"}
+        Subscribe
       </button>
 
+      {/* Crypto payment button */}
       {cryptoHref && (
         <a
           href={cryptoHref}
           className="
-            relative mt-4 inline-flex items-center justify-center
+            mt-4 inline-flex items-center justify-center
             rounded-full bg-emerald-600 px-4 py-3 text-sm font-semibold text-white
             shadow-lg shadow-emerald-500/30
             hover:bg-emerald-500 hover:shadow-emerald-500/50
             focus-ring transition
           "
         >
-          <span className="absolute -top-2 right-3 rounded-full bg-emerald-700 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
-            Recommended
-          </span>
           Subscribe with Crypto
         </a>
       )}
