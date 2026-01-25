@@ -51,7 +51,7 @@ export const plans: Plan[] = [
   },
   {
     id: "sixmonths",
-    name: "Six Months Membership",
+    name: "Six-Month Membership",
     price: "$250",
     cadence: "6 months access",
     description: "6 months",
