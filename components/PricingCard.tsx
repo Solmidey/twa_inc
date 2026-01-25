@@ -8,6 +8,7 @@ export type Plan = {
   cadence: string;
   description?: string;
   features?: string[];
+  tag?: string;
 };
 
 export default function PricingCard({
@@ -48,6 +49,11 @@ export default function PricingCard({
         {highlight && (
           <span className="rounded-full bg-brand-primary/15 px-3 py-1 text-xs font-semibold text-brand-primary">
             Popular
+          </span>
+        )}
+        {(plan as any).tag && !highlight && (
+          <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-600">
+            {(plan as any).tag}
           </span>
         )}
       </header>
