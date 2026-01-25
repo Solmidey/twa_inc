@@ -1,7 +1,6 @@
 export const DISCORD_PERKS = [
   "Live Market Calls",
   "Session Calls",
-  "Weekend Calls",
   "Active Community",
   "Private mentorship",
 ] as const;
