@@ -40,11 +40,6 @@ export default function PricingCard({
           <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
             {plan.name}
           </h3>
-          {plan.description && (
-            <p className="text-sm text-slate-600 dark:text-slate-300">
-              {plan.description}
-            </p>
-          )}
         </div>
         {highlight && (
           <span className="rounded-full bg-brand-primary/15 px-3 py-1 text-xs font-semibold text-brand-primary">
