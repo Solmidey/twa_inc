@@ -48,6 +48,26 @@ export const plans: Plan[] = [
     priceUsd: 150,
     features: [...DISCORD_PERKS],
   },
+  {
+    id: "sixmonths",
+    name: "Six Month Membership",
+    price: "$250",
+    cadence: "6 months access",
+    description: "Private Discord access for six months. Save $50!",
+    months: 6,
+    priceUsd: 250,
+    features: [...DISCORD_PERKS],
+  },
+  {
+    id: "yearly",
+    name: "Yearly Membership",
+    price: "$500",
+    cadence: "12 months access",
+    description: "Private Discord access for one year. Save $100!",
+    months: 12,
+    priceUsd: 500,
+    features: [...DISCORD_PERKS],
+  },
 ];
 
 export function getPlan(planId: string) {

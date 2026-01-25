@@ -15,13 +15,11 @@ export default function PricingCard({
   onSelect,
   highlight,
   loading,
-  cryptoHref,
 }: {
   plan: Plan;
   onSelect: (plan: Plan) => void;
   highlight?: boolean;
   loading?: boolean;
-  cryptoHref?: string;
 }) {
   return (
     <motion.article
@@ -75,35 +73,21 @@ export default function PricingCard({
         </ul>
       )}
 
-      {/* Paystack button (disabled / greyed out) */}
+      {/* Paystack button */}
       <button
         type="button"
         onClick={() => onSelect(plan)}
-        disabled
+        disabled={loading}
         aria-busy={!!loading}
         className="
-          mt-auto rounded-full bg-slate-400 px-4 py-3 text-sm font-semibold text-white
-          cursor-not-allowed opacity-60 shadow-none
+          mt-auto rounded-full bg-brand-primary px-4 py-3 text-sm font-semibold text-white
+          shadow-lg shadow-brand-primary/30 transition
+          disabled:opacity-60 disabled:cursor-not-allowed
+          hover:enabled:bg-brand-primary/90 hover:enabled:shadow-brand-primary/50
         "
       >
-        Subscribe
+        {loading ? 'Processing...' : 'Subscribe'}
       </button>
-
-      {/* Crypto payment button */}
-      {cryptoHref && (
-        <a
-          href={cryptoHref}
-          className="
-            mt-4 inline-flex items-center justify-center
-            rounded-full bg-emerald-600 px-4 py-3 text-sm font-semibold text-white
-            shadow-lg shadow-emerald-500/30
-            hover:bg-emerald-500 hover:shadow-emerald-500/50
-            focus-ring transition
-          "
-        >
-          Subscribe with Crypto
-        </a>
-      )}
     </motion.article>
   );
 }

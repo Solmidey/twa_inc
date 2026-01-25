@@ -10,8 +10,61 @@ export default function Pricing() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [message, setMessage] = useState<string>('');
 
-  const handleCheckoutDisabled = () => {
-    setMessage("Paystack payments are currently disabled. Please use Crypto payment instead.");
+  const handleCheckout = async (planId: string) => {
+    const plan = getPlan(planId);
+
+    if (!plan) {
+      setMessage('Unknown plan selected. Please refresh and try again.');
+      return;
+    }
+
+    if (!email) {
+      setMessage('Please add an email so we can send your receipt and unlock the Discord.');
+      return;
+    }
+
+    try {
+      setLoadingPlan(planId);
+      setMessage('');
+
+      const payload: any = { planId: plan.id ?? planId, email };
+
+      // Optional hints for the API (safe even if API ignores them)
+      if ((plan as any).months) payload.months = (plan as any).months;
+      if ((plan as any).priceUsd) payload.priceUsd = (plan as any).priceUsd;
+      if ((plan as any).price) payload.price = (plan as any).price;
+
+      const res = await fetch('/api/paystack/initialize-transaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(data?.error ?? data?.message ?? 'Unable to start checkout.');
+        return;
+      }
+
+      const paystackUrl =
+        data?.data?.authorization_url ??
+        data?.authorization_url ??
+        data?.authorizationUrl ??
+        data?.url;
+
+      if (!paystackUrl) {
+        setMessage(data?.error ?? data?.message ?? 'Paystack returned no authorization URL');
+        return;
+      }
+
+      window.location.href = paystackUrl;
+    } catch (error) {
+      console.error(error);
+      setMessage('Paystack error. Please confirm PAYSTACK_SECRET_KEY is set on Vercel.');
+    } finally {
+      setLoadingPlan(null);
+    }
   };
 
 
@@ -64,7 +117,6 @@ export default function Pricing() {
           </label>
 
           {message && <p className="mt-3 text-sm text-red-500">{message}</p>}
-<p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Paystack payments are currently disabled. Please use Crypto payment instead.</p>
 
           <div className="mt-10 mx-auto max-w-3xl rounded-3xl border border-white/10 bg-white/70 p-6 text-left shadow-lg dark:bg-white/5">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
@@ -81,20 +133,17 @@ export default function Pricing() {
           </div>
         </div>
 
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {plans.map((plan, idx) => (
-              <PricingCard
-                key={plan.id}
-                plan={{ ...plan, features: [] }}
-                highlight={idx === 1}
-                loading={loadingPlan === plan.id}
-                onSelect={() => setMessage("Paystack payments are currently disabled. Please use Crypto payment instead.")}
-                cryptoHref={`/crypto-checkout?planId=${plan.id}${
-                  email ? `&email=${encodeURIComponent(email)}` : ""
-                }`}
-              />
-            ))}
-          </div>
+        <div className="mt-12 grid gap-6 md:grid-cols-3 lg:grid-cols-5">
+          {plans.map((plan, idx) => (
+            <PricingCard
+              key={plan.id}
+              plan={plan}
+              highlight={idx === 4}
+              loading={loadingPlan === plan.id}
+              onSelect={() => handleCheckout(plan.id)}
+            />
+          ))}
+        </div>
       </main>
 
       <Footer />
