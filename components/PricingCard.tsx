@@ -67,20 +67,6 @@ export default function PricingCard({
         </p>
       </div>
 
-      {!!plan.features?.length && (
-        <ul className="mb-8 space-y-2 text-sm text-slate-700 dark:text-slate-200">
-          {plan.features.map((feature) => (
-            <li key={feature} className="flex items-start gap-2">
-              <span
-                className="mt-1 inline-block h-2 w-2 rounded-full bg-brand-primary"
-                aria-hidden
-              />
-              <span>{feature}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-
       {/* Paystack button */}
       <button
         type="button"
