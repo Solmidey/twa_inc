@@ -15,11 +15,13 @@ export default function PricingCard({
   onSelect,
   highlight,
   loading,
+  cryptoHref,
 }: {
   plan: Plan;
   onSelect: (plan: Plan) => void;
   highlight?: boolean;
   loading?: boolean;
+  cryptoHref?: string;
 }) {
   return (
     <motion.article
@@ -88,6 +90,22 @@ export default function PricingCard({
       >
         {loading ? 'Processing...' : 'Subscribe'}
       </button>
+
+      {/* Crypto payment button */}
+      {cryptoHref && (
+        <a
+          href={cryptoHref}
+          className="
+            mt-4 inline-flex items-center justify-center
+            rounded-full bg-emerald-600 px-4 py-3 text-sm font-semibold text-white
+            shadow-lg shadow-emerald-500/30
+            hover:bg-emerald-500 hover:shadow-emerald-500/50
+            transition
+          "
+        >
+          Pay with Crypto
+        </a>
+      )}
     </motion.article>
   );
 }

@@ -138,9 +138,11 @@ export default function Pricing() {
             <PricingCard
               key={plan.id}
               plan={plan}
-              highlight={idx === 4}
               loading={loadingPlan === plan.id}
               onSelect={() => handleCheckout(plan.id)}
+              cryptoHref={`/crypto-checkout?planId=${plan.id}${
+                email ? `&email=${encodeURIComponent(email)}` : ""
+              }`}
             />
           ))}
         </div>
